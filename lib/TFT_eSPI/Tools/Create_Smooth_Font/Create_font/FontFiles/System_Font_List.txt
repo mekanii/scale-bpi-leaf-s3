@@ -1,0 +1,654 @@
+[0] AIGDT
+[1] AMGDT
+[2] AcadEref
+[3] Agency FB
+[4] Agency FB Bold
+[5] Algerian
+[6] AmdtSymbols
+[7] Arial
+[8] Arial Black
+[9] Arial Bold
+[10] Arial Bold Italic
+[11] Arial Italic
+[12] Arial Narrow
+[13] Arial Narrow Bold
+[14] Arial Narrow Bold Italic
+[15] Arial Narrow Italic
+[16] Arial Rounded MT Bold
+[17] Artifakt Element Black Italic
+[18] Artifakt Element Bold
+[19] Artifakt Element Bold Italic
+[20] Artifakt Element Book Italic
+[21] Artifakt Element Hair Italic
+[22] Artifakt Element Heavy Italic
+[23] Artifakt Element Italic
+[24] Artifakt Element Light Italic
+[25] Artifakt Element Medium Italic
+[26] Artifakt Element Thin Italic
+[27] ArtifaktElement-Black
+[28] ArtifaktElement-Book
+[29] ArtifaktElement-Hair
+[30] ArtifaktElement-Heavy
+[31] ArtifaktElement-Light
+[32] ArtifaktElement-Medium
+[33] ArtifaktElement-Regular
+[34] ArtifaktElement-Thin
+[35] Bahnschrift
+[36] Bahnschrift Bold
+[37] Bahnschrift Bold Condensed
+[38] Bahnschrift Bold SemiCondensed
+[39] Bahnschrift Condensed
+[40] Bahnschrift Light
+[41] Bahnschrift Light Condensed
+[42] Bahnschrift Light SemiCondensed
+[43] Bahnschrift Regular
+[44] Bahnschrift SemiBold
+[45] Bahnschrift SemiBold Condensed
+[46] Bahnschrift SemiBold SemiCondensed
+[47] Bahnschrift SemiCondensed
+[48] Bahnschrift SemiLight
+[49] Bahnschrift SemiLight Condensed
+[50] Bahnschrift SemiLight SemiCondensed
+[51] Bank Gothic Light BT
+[52] Bank Gothic Medium BT
+[53] Baskerville Old Face
+[54] Bauhaus 93
+[55] Bell MT
+[56] Bell MT Bold
+[57] Bell MT Italic
+[58] Berlin Sans FB
+[59] Berlin Sans FB Bold
+[60] Berlin Sans FB Demi Bold
+[61] Bernard MT Condensed
+[62] Blackadder ITC
+[63] Bodoni Bd BT Bold
+[64] Bodoni Bd BT Bold Italic
+[65] Bodoni Bk BT Book
+[66] Bodoni Bk BT Book Italic
+[67] Bodoni MT
+[68] Bodoni MT Black
+[69] Bodoni MT Black Italic
+[70] Bodoni MT Bold
+[71] Bodoni MT Bold Italic
+[72] Bodoni MT Condensed
+[73] Bodoni MT Condensed Bold
+[74] Bodoni MT Condensed Bold Italic
+[75] Bodoni MT Condensed Italic
+[76] Bodoni MT Italic
+[77] Bodoni MT Poster Compressed
+[78] Book Antiqua
+[79] Book Antiqua Bold
+[80] Book Antiqua Bold Italic
+[81] Book Antiqua Italic
+[82] Bookman Old Style
+[83] Bookman Old Style Bold
+[84] Bookman Old Style Bold Italic
+[85] Bookman Old Style Italic
+[86] Bookshelf Symbol 7
+[87] Bradley Hand ITC
+[88] Britannic Bold
+[89] Broadway
+[90] Brush Script MT Italic
+[91] Calibri
+[92] Calibri Bold
+[93] Calibri Bold Italic
+[94] Calibri Italic
+[95] Calibri Light
+[96] Calibri Light Italic
+[97] Californian FB
+[98] Californian FB Bold
+[99] Californian FB Italic
+[100] Calisto MT
+[101] Calisto MT Bold
+[102] Calisto MT Bold Italic
+[103] Calisto MT Italic
+[104] Cambria
+[105] Cambria Bold
+[106] Cambria Bold Italic
+[107] Cambria Italic
+[108] Cambria Math
+[109] Candara
+[110] Candara Bold
+[111] Candara Bold Italic
+[112] Candara Italic
+[113] Candara Light
+[114] Candara Light Italic
+[115] Cascadia Code Bold
+[116] Cascadia Code ExtraLight
+[117] Cascadia Code Light
+[118] Cascadia Code Regular
+[119] Cascadia Code SemiBold
+[120] Cascadia Code SemiLight
+[121] Cascadia Mono Bold
+[122] Cascadia Mono ExtraLight
+[123] Cascadia Mono Light
+[124] Cascadia Mono Regular
+[125] Cascadia Mono SemiBold
+[126] Cascadia Mono SemiLight
+[127] Castellar
+[128] CentSchbkCyrill BT Bold
+[129] CentSchbkCyrill BT Bold Italic
+[130] CentSchbkCyrill BT Italic
+[131] CentSchbkCyrill BT Roman
+[132] Centaur
+[133] Century
+[134] Century Gothic
+[135] Century Gothic Bold
+[136] Century Gothic Bold Italic
+[137] Century Gothic Italic
+[138] Century Schoolbook
+[139] Century Schoolbook Bold
+[140] Century Schoolbook Bold Italic
+[141] Century Schoolbook Italic
+[142] Century725 Cn BT
+[143] Century751 BT Italic
+[144] Century751 BT Roman
+[145] Century751 No2 BT Bold
+[146] Century751 No2 BT Bold Italic
+[147] Century751 No2 BT Italic
+[148] Century751 No2 BT Roman
+[149] Century751 SeBd BT Semi Bold
+[150] Century751 SeBd BT Semi Bold Italic
+[151] Chakra Petch Bold
+[152] Chakra Petch Bold Italic
+[153] Chakra Petch Italic
+[154] Chakra Petch Light
+[155] Chakra Petch Light Italic
+[156] Chakra Petch Medium
+[157] Chakra Petch Medium Italic
+[158] Chakra Petch Regular
+[159] Chiller
+[160] CityBlueprint
+[161] Clarendon BT Bold
+[162] Clarendon BT Roman
+[163] Clarendon Blk BT Black
+[164] Clarendon Lt BT Light
+[165] Colonna MT
+[166] Comic Sans MS
+[167] Comic Sans MS Bold
+[168] Comic Sans MS Bold Italic
+[169] Comic Sans MS Italic
+[170] Commercial Pi BT
+[171] Commercial Script BT
+[172] Complex
+[173] Consolas
+[174] Consolas Bold
+[175] Consolas Bold Italic
+[176] Consolas Italic
+[177] Constantia
+[178] Constantia Bold
+[179] Constantia Bold Italic
+[180] Constantia Italic
+[181] Cooper Black
+[182] Copperplate Gothic Bold
+[183] Copperplate Gothic Light
+[184] Corbel
+[185] Corbel Bold
+[186] Corbel Bold Italic
+[187] Corbel Italic
+[188] Corbel Light
+[189] Corbel Light Italic
+[190] CountryBlueprint
+[191] Courier New
+[192] Courier New Bold
+[193] Courier New Bold Italic
+[194] Courier New Italic
+[195] Curlz MT
+[196] DFGothic-EB
+[197] DFKaiSho-SB
+[198] DFMincho-SU
+[199] DFMincho-UB
+[200] DFMincho-W5
+[201] DFPOP1-W9
+[202] DeVinne Txt BT
+[203] Dialog.bold
+[204] Dialog.bolditalic
+[205] Dialog.italic
+[206] Dialog.plain
+[207] DialogInput.bold
+[208] DialogInput.bolditalic
+[209] DialogInput.italic
+[210] DialogInput.plain
+[211] Dubai Bold
+[212] Dubai Light
+[213] Dubai Medium
+[214] Dubai Regular
+[215] Dutch 801 Bold BT
+[216] Dutch 801 Bold Italic BT
+[217] Dutch 801 Extra Bold BT
+[218] Dutch 801 Italic BT
+[219] Dutch 801 Roman BT
+[220] Ebrima
+[221] Ebrima Bold
+[222] Edwardian Script ITC
+[223] Elephant
+[224] Elephant Italic
+[225] Embassy BT
+[226] Engravers MT
+[227] EngraversGothic BT
+[228] Eras Bold ITC
+[229] Eras Demi ITC
+[230] Eras Light ITC
+[231] Eras Medium ITC
+[232] EuroRoman
+[233] EuroRoman Oblique
+[234] Exotc350 Bd BT Bold
+[235] Exotc350 DmBd BT Demi-Bold
+[236] Felix Titling
+[237] Footlight MT Light
+[238] Forte
+[239] Franklin Gothic Book
+[240] Franklin Gothic Book Italic
+[241] Franklin Gothic Demi
+[242] Franklin Gothic Demi Cond
+[243] Franklin Gothic Demi Italic
+[244] Franklin Gothic Heavy
+[245] Franklin Gothic Heavy Italic
+[246] Franklin Gothic Medium
+[247] Franklin Gothic Medium Cond
+[248] Franklin Gothic Medium Italic
+[249] Freehand521 BT
+[250] Freestyle Script
+[251] French Script MT
+[252] Futura Bk BT Book
+[253] Futura Bk BT Book Italic
+[254] Futura Md BT Bold
+[255] Futura Md BT Bold Italic
+[256] Futura Md BT Medium
+[257] Futura Md BT Medium Italic
+[258] GDT
+[259] GENISO
+[260] Gabriola
+[261] Gadugi
+[262] Gadugi Bold
+[263] Garamond
+[264] Garamond Bold
+[265] Garamond Italic
+[266] GeoSlab703 Md BT Bold
+[267] GeoSlab703 Md BT Bold Italic
+[268] GeoSlab703 Md BT Medium
+[269] GeoSlab703 Md BT Medium Italic
+[270] GeoSlab703 MdCn BT Bold
+[271] GeoSlab703 MdCn BT Medium
+[272] Geometr212 BkCn BT Book
+[273] Geometr212 BkCn BT Heavy
+[274] Geometr415 Blk BT Black
+[275] Geometr706 BlkCn BT Black
+[276] Georgia
+[277] Georgia Bold
+[278] Georgia Bold Italic
+[279] Georgia Italic
+[280] Gigi
+[281] Gill Sans MT
+[282] Gill Sans MT Bold
+[283] Gill Sans MT Bold Italic
+[284] Gill Sans MT Condensed
+[285] Gill Sans MT Ext Condensed Bold
+[286] Gill Sans MT Italic
+[287] Gill Sans Ultra Bold
+[288] Gill Sans Ultra Bold Condensed
+[289] Gloucester MT Extra Condensed
+[290] GothicE
+[291] GothicG
+[292] GothicI
+[293] Goudy Old Style
+[294] Goudy Old Style Bold
+[295] Goudy Old Style Italic
+[296] Goudy Stout
+[297] GreekC
+[298] GreekS
+[299] Haettenschweiler
+[300] Harlow Solid Italic
+[301] Harrington
+[302] High Tower Text
+[303] High Tower Text Italic
+[304] HoloLens MDL2 Assets
+[305] Humanst521 BT Bold
+[306] Humanst521 BT Bold Italic
+[307] Humanst521 BT Italic
+[308] Humanst521 BT Roman
+[309] Humanst521 Lt BT Light
+[310] Humanst521 Lt BT Light Italic
+[311] Humnst777 BT Roman
+[312] Humnst777 Blk BT Black Italic
+[313] Humnst777 BlkCn BT Black
+[314] Humnst777 Cn BT
+[315] Humnst777 Cn BT Bold
+[316] Humnst777 Lt BT Light
+[317] ISOCP
+[318] ISOCP2
+[319] ISOCP3
+[320] ISOCPEUR
+[321] ISOCPEUR Italic
+[322] ISOCT
+[323] ISOCT2
+[324] ISOCT3
+[325] ISOCTEUR
+[326] ISOCTEUR Italic
+[327] Impact
+[328] Imprint MT Shadow
+[329] Informal Roman
+[330] Ink Free
+[331] Italic
+[332] ItalicC
+[333] ItalicT
+[334] Javanese Text
+[335] Jokerman
+[336] Juice ITC
+[337] Kanit Regular
+[338] Kaufmann BT
+[339] Kristen ITC
+[340] Kunstler Script
+[341] Leelawadee
+[342] Leelawadee Bold
+[343] Leelawadee UI
+[344] Leelawadee UI Bold
+[345] Leelawadee UI Semilight
+[346] Lucida Bright
+[347] Lucida Bright Demibold
+[348] Lucida Bright Demibold Italic
+[349] Lucida Bright Italic
+[350] Lucida Calligraphy Italic
+[351] Lucida Console
+[352] Lucida Fax Demibold
+[353] Lucida Fax Demibold Italic
+[354] Lucida Fax Italic
+[355] Lucida Fax Regular
+[356] Lucida Handwriting Italic
+[357] Lucida Sans Demibold Italic
+[358] Lucida Sans Demibold Roman
+[359] Lucida Sans Italic
+[360] Lucida Sans Regular
+[361] Lucida Sans Typewriter Bold
+[362] Lucida Sans Typewriter Bold Oblique
+[363] Lucida Sans Typewriter Oblique
+[364] Lucida Sans Typewriter Regular
+[365] Lucida Sans Unicode
+[366] MS Gothic
+[367] MS Outlook
+[368] MS PGothic
+[369] MS Reference Sans Serif
+[370] MS Reference Specialty
+[371] MS UI Gothic
+[372] MT Extra
+[373] MV Boli
+[374] Magneto Bold
+[375] Maiandra GD
+[376] Malgun Gothic
+[377] Malgun Gothic Bold
+[378] Malgun Gothic Semilight
+[379] Marlett
+[380] Matura MT Script Capitals
+[381] Microsoft Himalaya
+[382] Microsoft JhengHei
+[383] Microsoft JhengHei Bold
+[384] Microsoft JhengHei Light
+[385] Microsoft JhengHei UI
+[386] Microsoft JhengHei UI Bold
+[387] Microsoft JhengHei UI Light
+[388] Microsoft New Tai Lue
+[389] Microsoft New Tai Lue Bold
+[390] Microsoft PhagsPa
+[391] Microsoft PhagsPa Bold
+[392] Microsoft Sans Serif
+[393] Microsoft Tai Le
+[394] Microsoft Tai Le Bold
+[395] Microsoft Uighur
+[396] Microsoft Uighur Bold
+[397] Microsoft YaHei
+[398] Microsoft YaHei Bold
+[399] Microsoft YaHei Light
+[400] Microsoft YaHei UI
+[401] Microsoft YaHei UI Bold
+[402] Microsoft YaHei UI Light
+[403] Microsoft Yi Baiti
+[404] MingLiU-ExtB
+[405] MingLiU_HKSCS-ExtB
+[406] Mistral
+[407] Modern No. 20
+[408] Mongolian Baiti
+[409] Monospace 821 BT
+[410] Monospace 821 Bold BT
+[411] Monospace 821 Bold Italic BT
+[412] Monospace 821 Italic BT
+[413] Monospaced.bold
+[414] Monospaced.bolditalic
+[415] Monospaced.italic
+[416] Monospaced.plain
+[417] Monotxt
+[418] Monotype Corsiva
+[419] Myanmar Text
+[420] Myanmar Text Bold
+[421] NSimSun
+[422] News701 BT Bold
+[423] News701 BT Italic
+[424] News706 BT Bold
+[425] NewsGoth BT Bold
+[426] NewsGoth BT Bold Italic
+[427] NewsGoth BT Italic
+[428] NewsGoth BT Roman
+[429] NewsGoth Lt BT Light
+[430] Niagara Engraved
+[431] Niagara Solid
+[432] Nirmala UI
+[433] Nirmala UI Bold
+[434] Nirmala UI Semilight
+[435] OCR A Extended
+[436] OCR-A BT
+[437] OCR-B 10 BT
+[438] Old English Text MT
+[439] Onyx
+[440] PMingLiU-ExtB
+[441] Palace Script MT
+[442] Palatino Linotype
+[443] Palatino Linotype Bold
+[444] Palatino Linotype Bold Italic
+[445] Palatino Linotype Italic
+[446] PanRoman
+[447] Papyrus
+[448] Parchment
+[449] Perpetua
+[450] Perpetua Bold
+[451] Perpetua Bold Italic
+[452] Perpetua Italic
+[453] Perpetua Titling MT Bold
+[454] Perpetua Titling MT Light
+[455] Playbill
+[456] Poor Richard
+[457] Pristina
+[458] Proxy 1
+[459] Proxy 2
+[460] Proxy 3
+[461] Proxy 4
+[462] Proxy 5
+[463] Proxy 6
+[464] Proxy 7
+[465] Proxy 8
+[466] Proxy 9
+[467] Rage Italic
+[468] Ravie
+[469] Rockwell
+[470] Rockwell Bold
+[471] Rockwell Bold Italic
+[472] Rockwell Condensed
+[473] Rockwell Condensed Bold
+[474] Rockwell Extra Bold
+[475] Rockwell Italic
+[476] RomanC
+[477] RomanD
+[478] RomanS
+[479] RomanT
+[480] Romantic
+[481] Romantic Bold
+[482] Romantic Italic
+[483] SansSerif
+[484] SansSerif Bold
+[485] SansSerif BoldOblique
+[486] SansSerif Oblique
+[487] SansSerif.bold
+[488] SansSerif.bolditalic
+[489] SansSerif.italic
+[490] SansSerif.plain
+[491] Schadow BT Bold
+[492] Schadow BT Roman
+[493] Script MT Bold
+[494] ScriptC
+[495] ScriptS
+[496] Segoe MDL2 Assets
+[497] Segoe Print
+[498] Segoe Print Bold
+[499] Segoe Script
+[500] Segoe Script Bold
+[501] Segoe UI
+[502] Segoe UI Black
+[503] Segoe UI Black Italic
+[504] Segoe UI Bold
+[505] Segoe UI Bold Italic
+[506] Segoe UI Emoji
+[507] Segoe UI Historic
+[508] Segoe UI Italic
+[509] Segoe UI Light
+[510] Segoe UI Light Italic
+[511] Segoe UI Semibold
+[512] Segoe UI Semibold Italic
+[513] Segoe UI Semilight
+[514] Segoe UI Semilight Italic
+[515] Segoe UI Symbol
+[516] Serif.bold
+[517] Serif.bolditalic
+[518] Serif.italic
+[519] Serif.plain
+[520] Showcard Gothic
+[521] SimSun
+[522] SimSun-ExtB
+[523] Simplex
+[524] Sitka Banner
+[525] Sitka Banner Bold
+[526] Sitka Banner Bold Italic
+[527] Sitka Banner Italic
+[528] Sitka Display
+[529] Sitka Display Bold
+[530] Sitka Display Bold Italic
+[531] Sitka Display Italic
+[532] Sitka Heading
+[533] Sitka Heading Bold
+[534] Sitka Heading Bold Italic
+[535] Sitka Heading Italic
+[536] Sitka Small
+[537] Sitka Small Bold
+[538] Sitka Small Bold Italic
+[539] Sitka Small Italic
+[540] Sitka Subheading
+[541] Sitka Subheading Bold
+[542] Sitka Subheading Bold Italic
+[543] Sitka Subheading Italic
+[544] Sitka Text
+[545] Sitka Text Bold
+[546] Sitka Text Bold Italic
+[547] Sitka Text Italic
+[548] SmoothFantasy
+[549] SmoothFantasyPersonalUse
+[550] Snap ITC
+[551] Square721 BT Bold
+[552] Square721 BT Roman
+[553] Square721 Cn BT Bold
+[554] Square721 Cn BT Roman
+[555] Stencil
+[556] Stylus BT
+[557] SuperFrench
+[558] Swis721 BT Bold
+[559] Swis721 BT Bold Italic
+[560] Swis721 BT Italic
+[561] Swis721 BT Roman
+[562] Swis721 Blk BT Black
+[563] Swis721 BlkCn BT Black
+[564] Swis721 Cn BT Bold
+[565] Swis721 Cn BT Bold Italic
+[566] Swis721 Cn BT Italic
+[567] Swis721 Cn BT Roman
+[568] Swis721 Hv BT Heavy
+[569] Swis721 Lt BT Light
+[570] Swis721 Lt BT Light Italic
+[571] Swis721 LtEx BT Light
+[572] Swis721 WGL4 BT Bold
+[573] Swis721 WGL4 BT Bold Italic
+[574] Swis721 WGL4 BT Italic
+[575] Swis721 WGL4 BT Roman
+[576] Swiss 721 BT
+[577] Swiss 721 Black BT
+[578] Swiss 721 Black Condensed BT
+[579] Swiss 721 Black Condensed Italic BT
+[580] Swiss 721 Black Extended BT
+[581] Swiss 721 Black Italic BT
+[582] Swiss 721 Black Outline BT
+[583] Swiss 721 Bold BT
+[584] Swiss 721 Bold Condensed BT
+[585] Swiss 721 Bold Condensed Italic BT
+[586] Swiss 721 Bold Condensed Outline BT
+[587] Swiss 721 Bold Extended BT
+[588] Swiss 721 Bold Italic BT
+[589] Swiss 721 Bold Outline BT
+[590] Swiss 721 Condensed BT
+[591] Swiss 721 Condensed Italic BT
+[592] Swiss 721 Extended BT
+[593] Swiss 721 Italic BT
+[594] Swiss 721 Light BT
+[595] Swiss 721 Light Condensed BT
+[596] Swiss 721 Light Condensed Italic BT
+[597] Swiss 721 Light Extended BT
+[598] Swiss 721 Light Italic BT
+[599] Syastro
+[600] Sylfaen
+[601] Symap
+[602] Symath
+[603] Symbol
+[604] Symeteo
+[605] Symusic
+[606] Tahoma
+[607] Tahoma Bold
+[608] Technic
+[609] TechnicBold
+[610] TechnicLite
+[611] Tempus Sans ITC
+[612] Times New Roman
+[613] Times New Roman Bold
+[614] Times New Roman Bold Italic
+[615] Times New Roman Italic
+[616] Trebuchet MS
+[617] Trebuchet MS Bold
+[618] Trebuchet MS Bold Italic
+[619] Trebuchet MS Italic
+[620] Tw Cen MT
+[621] Tw Cen MT Bold
+[622] Tw Cen MT Bold Italic
+[623] Tw Cen MT Condensed
+[624] Tw Cen MT Condensed Bold
+[625] Tw Cen MT Condensed Extra Bold
+[626] Tw Cen MT Italic
+[627] Txt
+[628] TypoUpright BT
+[629] Universal Math 1 BT
+[630] Verdana
+[631] Verdana Bold
+[632] Verdana Bold Italic
+[633] Verdana Italic
+[634] Viner Hand ITC
+[635] Vineta BT
+[636] Vivaldi Italic
+[637] Vladimir Script
+[638] Webdings
+[639] Wide Latin
+[640] Wingdings
+[641] Wingdings 2
+[642] Wingdings 3
+[643] Yu Gothic Bold
+[644] Yu Gothic Light
+[645] Yu Gothic Medium
+[646] Yu Gothic Regular
+[647] Yu Gothic UI Bold
+[648] Yu Gothic UI Light
+[649] Yu Gothic UI Regular
+[650] Yu Gothic UI Semibold
+[651] Yu Gothic UI Semilight
+[652] ＤＦ中太楷書体
+[653] ＤＦ明朝体W5
