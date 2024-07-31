@@ -43,6 +43,8 @@ int stableReadingsCount = 0;
 const char* ssid = "BPI-LEAF-S3_01";
 const char* password = "12345678";
 
+String DEVICE_IP_ADDRESS = "";
+
 WebServer server(80);
 
 DynamicJsonDocument doc(1024);
@@ -635,6 +637,66 @@ void handleCreateCalibrationFactor() {
   server.send(200, "application/json", response);
 }
 
+void initServer() {
+  server.on("/parts", HTTP_GET, handleGetPartList);
+  server.on("/parts/", HTTP_GET, handleGetPart);
+  server.on("/parts", HTTP_POST, handleCreatePart);
+  server.on("/parts/", HTTP_DELETE, handleDeletePart);
+  server.on("/parts/", HTTP_PUT, handleUpdatePart);
+
+  server.on("/scale", HTTP_GET, handleUpdatePart);
+
+  server.on("/initCalibration", HTTP_GET, handleInitCalibration);
+  
+  server.on("/calibrationFactor", HTTP_POST, handleCreateCalibrationFactor);
+
+  server.begin();
+}
+
+void terminateServer() {
+  server.close();
+}
+
+boolean connectWiFi() {
+  int trial = 0;
+  while (WiFi.status() != WL_CONNECTED && trial < 10) {
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+    trial++;
+  }
+  
+  if (WiFi.status() == WL_CONNECTED) {
+    DEVICE_IP_ADDRESS = WiFi.localIP().toString();
+    Serial.println("Connected to WiFi");
+    Serial.println("IP address: ");
+    Serial.println(DEVICE_IP_ADDRESS);
+  } else {
+    Serial.println("Failed to connect to WiFi");
+    return false;
+  }
+
+  initServer();
+
+  return true;
+}
+
+boolean wiFiStationMode() {
+  if (WiFi.softAP(SSID, PASS)) {
+    DEVICE_IP_ADDRESS = WiFi.softAPIP().toString();
+    Serial.println("Starting SoftAP");
+    Serial.println("SoftAP IP address: ");
+    Serial.println(DEVICE_IP_ADDRESS);
+  } else {
+    Serial.println("Failed to start SoftAP");
+    return false;
+  }
+
+  initServer();
+
+  return true;
+}
+
 void displayMenu() {
   spr.loadFont(MONOFONTO28);
   for (int i = 0; i < ARRAY_SIZE(optsMenu); i++) {
@@ -951,6 +1013,10 @@ void rotaryButton() {
                 page2Name = 0;
                 break;
               case 1:
+                selectorIndex = 0;
+                dispalyMenuDisabled();
+                displaySettings();
+                page2Name = 1;
                 break;
             }
             break;
@@ -1040,21 +1106,32 @@ void rotaryButton() {
           case 1:   // settings
             switch(page3Name) {
               default:  // settings selection
-                if (selectorIndex == -1) {
-                  selectorIndex = 0;
-                  tft.fillScreen(TFT_BLACK);
-                  displayMenu();
-                  page2Name = -1;
-                } else {
-                  tft.fillScreen(TFT_BLACK);
-                  // partName = parts[selectorIndex]["name"].as<String>();
-                  // partStd = parts[selectorIndex]["std"].as<float>();
-                  // 
-                  selectorIndex = 0;
-                  // displayMainFrame();
-                  // displayMain(getScale());
-                  page3Name = 0;
+                tft.fillScreen(TFT_BLACK);
+                switch (selectorIndex) {
+                  case -1:
+                    selectorIndex = 0;
+                    displayMenu();
+                    page2Name = -1;
+                    break;
+                  case 0:
+                    selectorIndex = 0;
+                    connectWiFi();
+                    // displayMainFrame();
+                    // displayMain(getScale());
+                    page3Name = 0;
+                    break;
+                  case 1:
+                    selectorIndex = 0;
+                    wiFiStationMode();
+                    // displayMainFrame();
+                    // displayMain(getScale());
+                    page3Name = 0;
+                    break;
+                  case 2:
+                    break;
                 }
+                break;
+              case 0:
                 break;
             }
             break;
@@ -1065,47 +1142,6 @@ void rotaryButton() {
     lastSelectorIndex = -1;
     delay(500);
   }
-}
-
-boolean initWifi() {
-  int trial = 0;
-  while (WiFi.status() != WL_CONNECTED && trial < 10) {
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
-    delay(1000);
-    Serial.println("Connecting to WiFi...");
-    trial++;
-  }
-  
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("Connected to WiFi");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP().toString());
-  } else {
-    if (WiFi.softAP(SSID, PASS)) {
-      Serial.println("Failed to connect to WiFi, starting SoftAP");
-      Serial.println("SoftAP IP address: ");
-      Serial.println(WiFi.softAPIP().toString());
-    } else {
-      Serial.println("Failed to start SoftAP");
-      return false;
-    }
-  }
-
-  server.on("/parts", HTTP_GET, handleGetPartList);
-  server.on("/parts/", HTTP_GET, handleGetPart);
-  server.on("/parts", HTTP_POST, handleCreatePart);
-  server.on("/parts/", HTTP_DELETE, handleDeletePart);
-  server.on("/parts/", HTTP_PUT, handleUpdatePart);
-
-  server.on("/scale", HTTP_GET, handleUpdatePart);
-
-  server.on("/initCalibration", HTTP_GET, handleInitCalibration);
-  
-  server.on("/calibrationFactor", HTTP_POST, handleCreateCalibrationFactor);
-
-  server.begin();
-
-  return true;
 }
 
 void setup() {
@@ -1126,9 +1162,19 @@ void setup() {
   parts = doc["partList"].as<JsonArray>();
 
   initScale();
+
+  tft.init();
+  tft.setRotation(1);
+  spr.setColorDepth(16);
+
+  page1Name = 0;
+  tft.fillScreen(TFT_BLACK);
+  displayMenu();
 }
 
 void loop() {
+  rotarySelector();
+  rotaryButton();
   if (CONN_STATUS) {
     server.handleClient();
   }
