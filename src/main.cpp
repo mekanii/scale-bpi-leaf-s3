@@ -32,7 +32,7 @@ int stableReadingsCount = 0;
 #define ENCODER_BUTTON_PIN 46
 
 // Define pins for the Load Cell
-#define HX711_DT 48
+#define HX711_DT 35
 #define HX711_SCK 45
 
 #define WIFI_SSID "creati"
@@ -71,6 +71,7 @@ int page3Name = -1;
 
 String partName = "";
 float partStd = 0;
+String partUnit = "";
 
 int CHECK_STATUS = 0;
 boolean CONN_STATUS = false;
@@ -389,9 +390,44 @@ void updatePart(int id, String name, float std, String unit) {
 }
 
 /////////////////////////////////////////////////////////////////////
-void initScale() {
-  LoadCell.begin();
+void tareScale() {
+  LoadCell.tareNoDelay();
+  while (!LoadCell.getTareStatus()) {
+    LoadCell.update();
+    delay(100);
+    Serial.println("Taring...");
+  }
+  Serial.println("Tare complete");
+}
 
+float getCalibrationFactor() {
+  File file = SPIFFS.open("/config.json", "r");
+  if (!file) {
+    Serial.println("Failed to open file for reading");
+    return 1.0;  // Return the default calibration factor if file reading fails
+  }
+
+  DynamicJsonDocument temp(1024);
+  DeserializationError error = deserializeJson(temp, file);
+  file.close();
+  if (error) {
+    Serial.println("Failed to read file, using default calibration factor");
+    return 1.0;  // Return the default calibration factor if file reading fails
+  }
+
+  // Check if the calFactor key exists and is a valid float
+  if (!temp.containsKey("calFactor") || !temp["calFactor"].is<float>()) {
+    Serial.println("calFactor key is missing or not a valid float, using default calibration factor");
+    return 1.0;  // Return the default calibration factor if the key is missing or invalid
+  }
+
+  float calibrationFactor = temp["calFactor"].as<float>();
+  Serial.println("Calibration factor read from config: " + String(calibrationFactor));
+
+  return calibrationFactor;
+}
+
+void initScale() {
   // preciscion right after power-up can be improved by adding a few seconds of stabilizing time
   unsigned long stabilizingtime = 2000;
 
@@ -402,14 +438,22 @@ void initScale() {
     Serial.println("Timeout, check MCU>HX711 wiring and pin designations");
     while (1);
   } else {
-    // user set calibration value (float), initial value 1.0 may be used for this sketch
-    // float calibrationFactor = getCalibrationFactor
-    // LoadCell.setCalFactor(calibrationFator);
-    LoadCell.setCalFactor(1.0);
+    float calibrationFactor = getCalibrationFactor();
+    Serial.println(calibrationFactor);
+    if (calibrationFactor > 0) {
+      LoadCell.setCalFactor(calibrationFactor);
+    } else {
+      LoadCell.setCalFactor(1.0);
+    }
     Serial.println("Startup is complete");
   }
   while (!LoadCell.update());
-  // calibrate(); //start calibration procedure
+}
+
+void scaleBegin() {
+  LoadCell.begin();
+
+  initScale();
 }
 
 float getScale() {
@@ -452,16 +496,7 @@ bool initCalibration() {
   Serial.println("Place the load cell an a level stable surface.");
   Serial.println("Remove any load applied to the load cell.");
 
-  boolean _resume = false;
-  while (_resume == false) {
-    LoadCell.update();
-    LoadCell.tareNoDelay();
-    
-    if (LoadCell.getTareStatus() == true) {
-      Serial.println("Tare complete");
-      _resume = true;
-    }
-  }
+  tareScale();
 
   Serial.println("Now, place your known mass on the loadcell.");
   
@@ -469,35 +504,31 @@ bool initCalibration() {
 }
 
 float createCalibrationFactor(float knownWeight) {
-  // refresh the dataset to be sure that the known mass is measured correct
+  // Refresh the dataset to be sure that the known mass is measured correctly
   LoadCell.refreshDataSet();
+  Serial.println(knownWeight);
 
-  // get the new calibration value
+  // Get the new calibration value
   float newCalibrationFactor = LoadCell.getNewCalibration(knownWeight);
+
+  // Check if the new calibration factor is valid
+  if (isnan(newCalibrationFactor)) {
+    Serial.println("Failed to get new calibration factor, result is NaN");
+    return NAN;
+  }
 
   Serial.print("New calibration factor has been set to: ");
   Serial.println(newCalibrationFactor);
   Serial.println("Use this as calibration factor (calFactor) in your project sketch.");
 
-  Serial.println("Save this value to config.json ");
+  Serial.println("Save this value to config.json");
 
+  // Create a new JSON document to store the calibration factor
   StaticJsonDocument<200> temp;
   temp["calFactor"] = newCalibrationFactor;
 
-  // Try to open the existing file
-  File file = SPIFFS.open("/config.json", "r");
-  if (!file) {
-    Serial.println("Failed to open file for reading, creating new file");
-  } else {
-    DeserializationError error = deserializeJson(temp, file);
-    file.close();
-    if (error) {
-      Serial.println("Failed to read file, using empty JSON");
-    }
-  }
-
   // Open the file for writing
-  file = SPIFFS.open("/config.json", "w");
+  File file = SPIFFS.open("/config.json", "w");
   if (!file) {
     Serial.println("Failed to open file for writing");
     return newCalibrationFactor;  // Return the new calibration factor even if file writing fails
@@ -672,9 +703,11 @@ void handleCreateCalibrationFactor() {
   }
 
   float knownWeight = server.arg("knownWeight").toFloat();
-  createCalibrationFactor(knownWeight);
+  float calibrationFactor = createCalibrationFactor(knownWeight);
 
-  responseDoc["data"] = nullptr;
+  Serial.println(calibrationFactor);
+
+  responseDoc["data"] = calibrationFactor;
   responseDoc["message"] = "Calibration Factor created";
   responseDoc["status"] = 200;
   serializeJson(responseDoc, response);
@@ -819,7 +852,7 @@ void displayMainFrame() {
   spr.loadFont(MONOFONTO96);
   spr.setTextColor(TFT_ORANGE, TFT_BLACK);
   tft.setCursor(372, 120);
-  spr.printToSprite("gr");
+  spr.printToSprite(partUnit);
   spr.deleteSprite();
   spr.unloadFont();
 }
@@ -1124,7 +1157,12 @@ void rotaryButton() {
                   tft.fillScreen(TFT_BLACK);
                   partName = parts[selectorIndex]["name"].as<String>();
                   partStd = parts[selectorIndex]["std"].as<float>();
+                  partUnit = parts[selectorIndex]["unit"].as<String>();
                   selectorIndex = 0;
+                  
+                  initScale();
+                  tareScale();
+
                   displayMainFrame();
                   displayMain(getScale());
                   page3Name = 0;
@@ -1148,16 +1186,8 @@ void rotaryButton() {
                     break;
                   case 1:   // tare
                     {
-                      boolean _resume = false;
-                      while (_resume == false) {
-                        LoadCell.update();
-                        LoadCell.tareNoDelay();
-                        
-                        if (LoadCell.getTareStatus() == true) {
-                          Serial.println("Tare complete");
-                          _resume = true;
-                        }
-                      }
+                      tareScale();
+
                       selectorIndex = 0;
                       tft.fillScreen(TFT_BLACK);
                       displayMainFrame();
@@ -1276,7 +1306,7 @@ void setup() {
   doc = getPartList();
   parts = doc["partList"].as<JsonArray>();
 
-  initScale();
+  scaleBegin();
 
   tft.init();
   tft.setRotation(1);
