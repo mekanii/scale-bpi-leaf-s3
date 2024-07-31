@@ -265,6 +265,37 @@ void createPart(String name, float std, String unit) {
   Serial.println("unit: " + newPart["unit"].as<String>());
 }
 
+// Function to create partList.json with hardcoded content
+void createPartList() {
+  // Define the JSON content
+  const char* jsonContent = R"rawliteral(
+  {
+    "partList": [
+      { "id": 1,"name": "PART 01", "std": 100.00, "unit": "gr" },
+      { "id": 2,"name": "PART 02", "std": 500.00, "unit": "gr" },
+      { "id": 3,"name": "PART 03", "std": 1.25, "unit": "kg" }
+    ]
+  }
+  )rawliteral";
+
+  // Open file for writing
+  File file = SPIFFS.open("/partList.json", FILE_WRITE);
+  if (!file) {
+    Serial.println("Failed to open partList.json for writing");
+    return;
+  }
+
+  // Write the JSON content to the file
+  if (file.print(jsonContent)) {
+    Serial.println("partList.json created successfully");
+  } else {
+    Serial.println("Failed to write to partList.json");
+  }
+
+  // Close the file
+  file.close();
+}
+
 void deletePart(int id) {
   DynamicJsonDocument temp(1024);
 
@@ -301,6 +332,19 @@ void deletePart(int id) {
   }
   serializeJson(temp, file);
   file.close();
+}
+
+// Function to delete partList.json
+void deletePartList() {
+  if (SPIFFS.exists("/partList.json")) {
+    if (SPIFFS.remove("/partList.json")) {
+      Serial.println("Deleted partList.json successfully");
+    } else {
+      Serial.println("Failed to delete partList.json");
+    }
+  } else {
+    Serial.println("partList.json does not exist");
+  }
 }
 
 void updatePart(int id, String name, float std, String unit) {
@@ -651,10 +695,14 @@ void initServer() {
   server.on("/calibrationFactor", HTTP_POST, handleCreateCalibrationFactor);
 
   server.begin();
+
+  CONN_STATUS = true;
 }
 
 void terminateServer() {
   server.close();
+
+  CONN_STATUS = false;
 }
 
 boolean connectWiFi() {
@@ -891,6 +939,50 @@ void displaySettings() {
   spr.unloadFont();
 }
 
+void displayIPAddress() {
+  spr.loadFont(MONOFONTO28);
+  spr.setTextColor(TFT_ORANGE, TFT_BLACK);
+  tft.setCursor(10, 10);
+  spr.printToSprite(DEVICE_IP_ADDRESS);
+  spr.unloadFont();
+}
+
+boolean displayWiFi(int optIndex) {
+  spr.loadFont(MONOFONTO28);
+  spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
+  
+  switch (optIndex) {
+    case 0:
+      tft.setCursor(10, 10 + (1 * spr.fontHeight()));
+      spr.printToSprite("SSID: " + String(WIFI_SSID));
+  
+      tft.setCursor(10, 10 + (2 * spr.fontHeight()));
+      spr.printToSprite("PASS: " + String(WIFI_PASS));
+
+      break;
+    case 1:
+      tft.setCursor(10, 10 + (1 * spr.fontHeight()));
+      spr.printToSprite("SSID: " + String(SSID));
+  
+      tft.setCursor(10, 10 + (2 * spr.fontHeight()));
+      spr.printToSprite("PASS: " + String(PASS));
+
+      break;
+  }
+
+  spr.unloadFont();
+
+  return true;
+}
+
+void displayFailedWiFi() {
+  spr.loadFont(MONOFONTO28);
+  spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
+  tft.setCursor(10, 10);
+  spr.printToSprite("FAILED TO INITIALIZE WIFI");
+  spr.unloadFont();
+}
+
 bool constrainer(int *newPosition, int min, int arrSize) {
   bool state = false;
   selectorIndex = constrain(*newPosition, min, arrSize - 1);
@@ -955,7 +1047,7 @@ void rotarySelector() {
           case 1:   // settings
             switch(page3Name) {
               default:  // settings selection
-                if (constrainer(&newPosition, -1, parts.size())) {
+                if (constrainer(&newPosition, -1, ARRAY_SIZE(optsSettings))) {
                   displaySettings();
                 }
                 break;
@@ -1007,14 +1099,14 @@ void rotaryButton() {
           default:  // menu selection
             switch (selectorIndex){
               case 0:
-                selectorIndex = 0;
                 dispalyMenuDisabled();
+                selectorIndex = 0;
                 displayPart();
                 page2Name = 0;
                 break;
               case 1:
-                selectorIndex = 0;
                 dispalyMenuDisabled();
+                selectorIndex = 0;
                 displaySettings();
                 page2Name = 1;
                 break;
@@ -1109,29 +1201,49 @@ void rotaryButton() {
                 tft.fillScreen(TFT_BLACK);
                 switch (selectorIndex) {
                   case -1:
-                    selectorIndex = 0;
+                    selectorIndex = 1;
                     displayMenu();
                     page2Name = -1;
                     break;
                   case 0:
-                    selectorIndex = 0;
-                    connectWiFi();
-                    // displayMainFrame();
-                    // displayMain(getScale());
-                    page3Name = 0;
+                    if (connectWiFi()) {
+                      selectorIndex = 0;
+                      displayIPAddress();
+                      displayWiFi(0);
+                      initServer();
+                      page3Name = 0;
+                    } else {
+                      displayFailedWiFi();
+                      page3Name = 1;
+                    }
                     break;
                   case 1:
-                    selectorIndex = 0;
-                    wiFiStationMode();
-                    // displayMainFrame();
-                    // displayMain(getScale());
-                    page3Name = 0;
+                    if (wiFiStationMode()) {
+                      selectorIndex = 0;
+                      displayIPAddress();
+                      displayWiFi(1);
+                      initServer();
+                      page3Name = 0;
+                    } else {
+                      displayFailedWiFi();
+                      page3Name = 1;
+                    }
                     break;
                   case 2:
                     break;
                 }
                 break;
               case 0:
+                break;
+              case 1: // display failed WiFi
+                tft.fillScreen(TFT_BLACK);
+                selectorIndex = 1;
+                dispalyMenuDisabled();
+                selectorIndex = 0;
+                displaySettings();
+                page3Name = -1;
+
+                terminateServer();
                 break;
             }
             break;
@@ -1157,6 +1269,9 @@ void setup() {
     Serial.println("An Error has occurred while mounting SPIFFS");
     return;
   }
+
+  // deletePartList();
+  // createPartList();
 
   doc = getPartList();
   parts = doc["partList"].as<JsonArray>();
