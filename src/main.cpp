@@ -78,6 +78,12 @@ const char* optsMenu[2] = {
   "SETTINGS"
 };
 
+const char* optsSettings[3] = {
+  "CONNECT TO WIFI",
+  "WIFI STATION MODE",
+  "SERIAL PORT"
+}
+
 const char* optsOption[3] = {
   "CONTINUE",
   "TARE",
@@ -293,6 +299,32 @@ void displayExitDialog() {
   spr.unloadFont();
 }
 
+void displaySettings() {
+  spr.loadFont(MONOFONTO28);
+  tft.setCursor(200, 10);
+  if (selectorIndex == -1) {
+    spr.setTextColor(TFT_ORANGE, TFT_BLACK);
+    spr.printToSprite(String(" > back"));
+  } else {
+    spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
+    spr.printToSprite(String("    back"));
+  }
+
+  // Serial.println(partList.size());
+  for (int i = 0; i < optsSettings.size(); i++) {
+    // Serial.println(partList[i]["name"].as<String>());
+    tft.setCursor(200, 10 + ((i + 1) * spr.fontHeight()));
+    if (i == selectorIndex) {
+      spr.setTextColor(TFT_ORANGE, TFT_BLACK);
+      spr.printToSprite(String(" > ") + optsSettings[i]);
+    } else {
+      spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
+      spr.printToSprite(String("    ") + optsSettings[i]);
+    }
+  }
+  spr.unloadFont();
+}
+
 bool constrainer(int *newPosition, int min, int arrSize) {
   bool state = false;
   selectorIndex = constrain(*newPosition, min, arrSize - 1);
@@ -339,7 +371,7 @@ void rotarySelector() {
                   displayPart();
                 }
                 break;
-              case 0:   //main
+              case 0:   // main
                 displayMain(getScale());
                 break;
               case 1:   // options
@@ -355,6 +387,26 @@ void rotarySelector() {
             }
             break;
           case 1:   // settings
+            switch(page3Name) {
+              default:  // settings selection
+                if (constrainer(&newPosition, -1, parts.size())) {
+                  displaySettings();
+                }
+                break;
+              case 0:   // Connect To WiFi
+                // displayMain(getScale());
+                break;
+              case 1:   // WiFi Station Mode
+                // if (constrainer(&newPosition, 0, ARRAY_SIZE(optsOption))) {
+                //   displayOption();
+                // }
+                break;
+              case 2:   // Serial Port
+                // if (constrainer(&newPosition, 0, ARRAY_SIZE(optsExitDialog))) {
+                //   displayExitDialog();
+                // }
+                break;
+            }
             break;
         }
         break;
@@ -480,6 +532,24 @@ void rotaryButton() {
             }
             break;
           case 1:   // settings
+            switch(page3Name) {
+              default:  // settings selection
+                if (selectorIndex == -1) {
+                  selectorIndex = 0;
+                  tft.fillScreen(TFT_BLACK);
+                  displayMenu();
+                  page2Name = -1;
+                } else {
+                  tft.fillScreen(TFT_BLACK);
+                  // partName = parts[selectorIndex]["name"].as<String>();
+                  // partStd = parts[selectorIndex]["std"].as<float>();
+                  // 
+                  selectorIndex = 0;
+                  // displayMainFrame();
+                  // displayMain(getScale());
+                  page3Name = 0;
+                }
+                break;
             break;
         }
         break;
