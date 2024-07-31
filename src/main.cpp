@@ -82,7 +82,7 @@ const char* optsSettings[3] = {
   "CONNECT TO WIFI",
   "WIFI STATION MODE",
   "SERIAL PORT"
-}
+};
 
 const char* optsOption[3] = {
   "CONTINUE",
@@ -128,435 +128,6 @@ String dateTimeNow() {
     return String(dateTime.year()) + "-" + String(dateTime.month()) + "-" + String(dateTime.day()) + " " + String(dateTime.hour()) + ":" + String(dateTime.minute());
   } else {
     return "RTC ERR: 0000-00-00 00:00";
-  }
-}
-
-void displayMenu() {
-  spr.loadFont(MONOFONTO28);
-  for (int i = 0; i < ARRAY_SIZE(optsMenu); i++) {
-    tft.setCursor(30, 10 + i * spr.fontHeight());
-    if (i == selectorIndex) {
-      spr.setTextColor(TFT_ORANGE, TFT_BLACK);
-      spr.printToSprite(String(" > ") + optsMenu[i]);
-    } else {
-      spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
-      spr.printToSprite(String("    ") + optsMenu[i]);
-    }
-  }
-  spr.unloadFont();
-}
-
-void dispalyMenuDisabled() {
-  spr.loadFont(MONOFONTO28);
-  for (int i = 0; i < ARRAY_SIZE(optsMenu); i++) {
-    tft.setCursor(30, 10 + i * spr.fontHeight());
-    if (i == selectorIndex) {
-      spr.setTextColor(TFT_BROWN, TFT_BLACK);
-      spr.printToSprite(String(" > ") + optsMenu[i]);
-    } else {
-      spr.setTextColor(TFT_DARKGREY, TFT_BLACK);
-      spr.printToSprite(String("    ") + optsMenu[i]);
-    }
-  }
-  spr.unloadFont();
-}
-
-void displayPart() {
-  spr.loadFont(MONOFONTO28);
-  tft.setCursor(200, 10);
-  if (selectorIndex == -1) {
-    spr.setTextColor(TFT_ORANGE, TFT_BLACK);
-    spr.printToSprite(String(" > back"));
-  } else {
-    spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
-    spr.printToSprite(String("    back"));
-  }
-
-  // Serial.println(partList.size());
-  for (int i = 0; i < parts.size(); i++) {
-    // Serial.println(partList[i]["name"].as<String>());
-    tft.setCursor(200, 10 + ((i + 1) * spr.fontHeight()));
-    if (i == selectorIndex) {
-      spr.setTextColor(TFT_ORANGE, TFT_BLACK);
-      spr.printToSprite(String(" > ") + parts[i]["name"].as<String>());
-    } else {
-      spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
-      spr.printToSprite(String("    ") + parts[i]["name"].as<String>());
-    }
-  }
-  spr.unloadFont();
-}
-
-void displayMainFrame() {
-  spr.loadFont(MONOFONTO20);
-  spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
-  tft.setCursor(10, 10);
-  spr.printToSprite(String(dateTimeStart()));
-  
-  spr.unloadFont();
-  spr.loadFont(MONOFONTO28);
-  spr.setTextColor(TFT_ORANGE, TFT_BLACK);
-  tft.setCursor(10, 10 + (1 * spr.fontHeight()));
-  spr.printToSprite(partName);
-  tft.setCursor(10, 10 + (2 * spr.fontHeight()));
-  spr.printToSprite(String(partStd, 2));
-  spr.unloadFont();
-  
-  spr.loadFont(MONOFONTO96);
-  spr.setTextColor(TFT_ORANGE, TFT_BLACK);
-  tft.setCursor(372, 120);
-  spr.printToSprite("gr");
-  spr.deleteSprite();
-  spr.unloadFont();
-}
-
-void displayMain(float sc) {
-  spr.loadFont(MONOFONTO96);
-  spr.createSprite(372, 96);
-  spr.setTextDatum(TR_DATUM);
-  spr.setTextColor(TFT_WHITE, TFT_BLACK);
-  spr.fillSprite(TFT_BLACK);
-  spr.drawFloat(sc, 2, 360, 0);
-  spr.pushSprite(0, 120);
-  spr.unloadFont();
-}
-
-void displayCheckStatus() {
-  spr.loadFont(MONOFONTO96);
-  spr.createSprite(108, 96);
-  spr.setTextDatum(TL_DATUM);
-  if (CHECK_STATUS != 0) {
-    spr.fillSprite(TFT_BLACK);
-    if (CHECK_STATUS == 1) {
-      spr.setTextColor(TFT_GREEN, TFT_BLACK);
-      spr.drawString("OK", 0, 0);
-    } else if (CHECK_STATUS == 2) {
-      spr.setTextColor(TFT_RED, TFT_BLACK);
-      spr.drawString("NG", 0, 0);
-    }
-    spr.pushSprite(372, 216);
-    delay(2000);
-  } else {
-    spr.fillSprite(TFT_BLACK);
-    spr.pushSprite(372, 216);
-  }
-  spr.deleteSprite();
-  spr.unloadFont();
-}
-
-void displayHeader(String text) {
-  spr.loadFont(MONOFONTO28);
-  spr.createSprite(480, spr.fontHeight());
-  spr.setTextDatum(TC_DATUM);
-  spr.setTextColor(TFT_WHITE, TFT_BLACK);
-  spr.fillSprite(TFT_BLACK);
-  spr.drawString(text, 240, 0);
-  spr.pushSprite(0, 40);
-  tft.drawFastHLine(0, 80, 480, TFT_WHITE);
-  spr.deleteSprite();
-  spr.unloadFont();
-}
-
-void displayOption() {
-  spr.loadFont(MONOFONTO28);
-  spr.createSprite(480, spr.fontHeight());
-  spr.setTextDatum(TC_DATUM);
-  for (int i = 0; i < ARRAY_SIZE(optsOption); i++) {
-    if (i == selectorIndex) {
-      spr.setTextColor(TFT_ORANGE, TFT_BLACK);
-      spr.fillSprite(TFT_BLACK);
-      spr.drawString(optsOption[i], 240, 0);
-      spr.pushSprite(0, 100 + (i * 40));
-    } else {
-      spr.setTextColor(TFT_WHITE, TFT_BLACK);
-      spr.fillSprite(TFT_BLACK);
-      spr.drawString(optsOption[i], 240, 0);
-      spr.pushSprite(0, 100 + (i * 40));
-    }
-  }
-  spr.deleteSprite();
-  spr.unloadFont();
-}
-
-void displayExitDialog() {
-  spr.loadFont(MONOFONTO28);
-  spr.createSprite(480, spr.fontHeight());
-  spr.setTextDatum(TC_DATUM);
-  for (int i = 0; i < ARRAY_SIZE(optsExitDialog); i++) {
-    if (i == selectorIndex) {
-      spr.setTextColor(TFT_ORANGE, TFT_BLACK);
-      spr.fillSprite(TFT_BLACK);
-      spr.drawString(optsExitDialog[i], 240, 0);
-      spr.pushSprite(0, 100 + (i * 40));
-    } else {
-      spr.setTextColor(TFT_WHITE, TFT_BLACK);
-      spr.fillSprite(TFT_BLACK);
-      spr.drawString(optsExitDialog[i], 240, 0);
-      spr.pushSprite(0, 100 + (i * 40));
-    }
-  }
-  spr.deleteSprite();
-  spr.unloadFont();
-}
-
-void displaySettings() {
-  spr.loadFont(MONOFONTO28);
-  tft.setCursor(200, 10);
-  if (selectorIndex == -1) {
-    spr.setTextColor(TFT_ORANGE, TFT_BLACK);
-    spr.printToSprite(String(" > back"));
-  } else {
-    spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
-    spr.printToSprite(String("    back"));
-  }
-
-  // Serial.println(partList.size());
-  for (int i = 0; i < optsSettings.size(); i++) {
-    // Serial.println(partList[i]["name"].as<String>());
-    tft.setCursor(200, 10 + ((i + 1) * spr.fontHeight()));
-    if (i == selectorIndex) {
-      spr.setTextColor(TFT_ORANGE, TFT_BLACK);
-      spr.printToSprite(String(" > ") + optsSettings[i]);
-    } else {
-      spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
-      spr.printToSprite(String("    ") + optsSettings[i]);
-    }
-  }
-  spr.unloadFont();
-}
-
-bool constrainer(int *newPosition, int min, int arrSize) {
-  bool state = false;
-  selectorIndex = constrain(*newPosition, min, arrSize - 1);
-  if (selectorIndex != lastSelectorIndex) {
-    lastSelectorIndex = selectorIndex;
-    state = true;
-  } else if (selectorIndex == arrSize - 1) {
-    *newPosition = selectorIndex;
-    encoder.write(selectorIndex * 2);
-  } else if (selectorIndex == min) {
-    *newPosition = 0;
-    encoder.write(0);
-  }
-  return state;
-}
-
-bool checkStableState(float wt) {
-  if (wt >= wt - HYSTERESIS_STABLE_CHECK && wt <= wt + HYSTERESIS_STABLE_CHECK && abs(wt - lastWeight) <= HYSTERESIS_STABLE_CHECK) {
-  // if (abs(wt - lastWeight) < HYSTERESIS_STABLE_CHECK) {
-    stableReadingsCount++;
-  } else {
-    stableReadingsCount = 0;
-  }
-  lastWeight = wt;
-    
-  return stableReadingsCount >= STABLE_READING_REQUIRED;
-}
-
-void rotarySelector() {
-  int newPosition = encoder.read() / 2;
-  if (newPosition != selectorIndex) {
-    switch(page1Name) {
-      case 0: // menu
-        switch(page2Name) {
-          default:  // menu selection
-            if (constrainer(&newPosition, 0, ARRAY_SIZE(optsMenu))) {
-              displayMenu();
-            }
-            break;
-          case 0:   // start
-            switch(page3Name) {
-              default:  // part selection
-                if (constrainer(&newPosition, -1, parts.size())) {
-                  displayPart();
-                }
-                break;
-              case 0:   // main
-                displayMain(getScale());
-                break;
-              case 1:   // options
-                if (constrainer(&newPosition, 0, ARRAY_SIZE(optsOption))) {
-                  displayOption();
-                }
-                break;
-              case 2:   // exit dialog
-                if (constrainer(&newPosition, 0, ARRAY_SIZE(optsExitDialog))) {
-                  displayExitDialog();
-                }
-                break;
-            }
-            break;
-          case 1:   // settings
-            switch(page3Name) {
-              default:  // settings selection
-                if (constrainer(&newPosition, -1, parts.size())) {
-                  displaySettings();
-                }
-                break;
-              case 0:   // Connect To WiFi
-                // displayMain(getScale());
-                break;
-              case 1:   // WiFi Station Mode
-                // if (constrainer(&newPosition, 0, ARRAY_SIZE(optsOption))) {
-                //   displayOption();
-                // }
-                break;
-              case 2:   // Serial Port
-                // if (constrainer(&newPosition, 0, ARRAY_SIZE(optsExitDialog))) {
-                //   displayExitDialog();
-                // }
-                break;
-            }
-            break;
-        }
-        break;
-    }
-  }
-  else if (page1Name == 0 && page2Name == 0 && page3Name == 0) {
-    float weight = getScale();
-    displayMain(weight);
-
-    if (checkStableState(weight)) {
-      // if (weight >= 0 - HYSTERESIS && weight <= 0 + HYSTERESIS) {
-      if (weight <= partStd * 0.1f) {
-        CHECK_STATUS = 0;
-      } else if (weight >= partStd - HYSTERESIS && weight <= partStd + HYSTERESIS && CHECK_STATUS == 0) {
-        CHECK_STATUS = 1;
-        // beep.OK();
-      } else if (CHECK_STATUS == 0) {
-        CHECK_STATUS = 2;
-        // beep.NG();
-      }
-      displayCheckStatus();
-    }
-  }
-}
-
-void rotaryButton() {
-  if (digitalRead(ENCODER_BUTTON_PIN) == LOW) {
-    encoder.write(0);
-    switch(page1Name) {
-      case 0: // menu
-        switch(page2Name) {
-          default:  // menu selection
-            switch (selectorIndex){
-              case 0:
-                selectorIndex = 0;
-                dispalyMenuDisabled();
-                displayPart();
-                page2Name = 0;
-                break;
-              case 1:
-                break;
-            }
-            break;
-          case 0:   // start
-            switch(page3Name) {
-              default:  // part selection
-                if (selectorIndex == -1) {
-                  selectorIndex = 0;
-                  tft.fillScreen(TFT_BLACK);
-                  displayMenu();
-                  page2Name = -1;
-                } else {
-                  tft.fillScreen(TFT_BLACK);
-                  partName = parts[selectorIndex]["name"].as<String>();
-                  partStd = parts[selectorIndex]["std"].as<float>();
-                  selectorIndex = 0;
-                  displayMainFrame();
-                  displayMain(getScale());
-                  page3Name = 0;
-                }
-                break;
-              case 0:   //main
-                selectorIndex = 0;
-                tft.fillScreen(TFT_BLACK);
-                displayHeader("OPTIONS");
-                displayOption();
-                page3Name = 1;
-                break;
-              case 1:   // options
-                switch (selectorIndex) {
-                  case 0:   // continue
-                    selectorIndex = 0;
-                    tft.fillScreen(TFT_BLACK);
-                    displayMainFrame();
-                    displayMain(getScale());
-                    page3Name = 0;
-                    break;
-                  case 1:   // tare
-                    boolean _resume = false;
-                    while (_resume == false) {
-                      LoadCell.update();
-                      LoadCell.tareNoDelay();
-                      
-                      if (LoadCell.getTareStatus() == true) {
-                        Serial.println("Tare complete");
-                        _resume = true;
-                      }
-                    }
-                    selectorIndex = 0;
-                    tft.fillScreen(TFT_BLACK);
-                    displayMainFrame();
-                    displayMain(getScale());
-                    page3Name = 0;
-                    break;
-                  case 2:   // exit
-                    selectorIndex = 0;
-                    tft.fillScreen(TFT_BLACK);
-                    displayHeader("Are you sure?");
-                    displayExitDialog();
-                    page3Name = 2;
-                    break;
-                }
-                break;
-              case 2:   // exit dialog
-                switch (selectorIndex) {
-                  case 0:   // continue
-                    selectorIndex = 0;
-                    tft.fillScreen(TFT_BLACK);
-                    displayMainFrame();
-                    displayMain(getScale());
-                    page3Name = 0;
-                    break;
-                  case 1:   // exit
-                    selectorIndex = 0;
-                    tft.fillScreen(TFT_BLACK);
-                    displayMenu();
-                    page1Name = 0;
-                    page2Name = -1;
-                    page3Name = -1;
-                    break;
-                }
-                break;
-            }
-            break;
-          case 1:   // settings
-            switch(page3Name) {
-              default:  // settings selection
-                if (selectorIndex == -1) {
-                  selectorIndex = 0;
-                  tft.fillScreen(TFT_BLACK);
-                  displayMenu();
-                  page2Name = -1;
-                } else {
-                  tft.fillScreen(TFT_BLACK);
-                  // partName = parts[selectorIndex]["name"].as<String>();
-                  // partStd = parts[selectorIndex]["std"].as<float>();
-                  // 
-                  selectorIndex = 0;
-                  // displayMainFrame();
-                  // displayMain(getScale());
-                  page3Name = 0;
-                }
-                break;
-            break;
-        }
-        break;
-    }
-    selectorIndex = 0;
-    lastSelectorIndex = -1;
-    delay(500);
   }
 }
 
@@ -867,17 +438,10 @@ float createCalibrationFactor(float knownWeight) {
   StaticJsonDocument<200> temp;
   temp["calFactor"] = newCalibrationFactor;
 
-  // Try to read the existing file
+  // Try to open the existing file
   File file = SPIFFS.open("/config.json", "r");
   if (!file) {
     Serial.println("Failed to open file for reading, creating new file");
-    // Create a new file
-    file = SPIFFS.open("/config.json", "w");
-    if (!file) {
-      Serial.println("Failed to create new file");
-      return;
-    }
-    file.close();
   } else {
     DeserializationError error = deserializeJson(temp, file);
     file.close();
@@ -886,12 +450,14 @@ float createCalibrationFactor(float knownWeight) {
     }
   }
 
-  // Write the updated file
+  // Open the file for writing
   file = SPIFFS.open("/config.json", "w");
   if (!file) {
     Serial.println("Failed to open file for writing");
-    return;
+    return newCalibrationFactor;  // Return the new calibration factor even if file writing fails
   }
+
+  // Write the updated JSON to the file
   serializeJson(temp, file);
   file.close();
 
@@ -1067,6 +633,438 @@ void handleCreateCalibrationFactor() {
   responseDoc["status"] = 200;
   serializeJson(responseDoc, response);
   server.send(200, "application/json", response);
+}
+
+void displayMenu() {
+  spr.loadFont(MONOFONTO28);
+  for (int i = 0; i < ARRAY_SIZE(optsMenu); i++) {
+    tft.setCursor(30, 10 + i * spr.fontHeight());
+    if (i == selectorIndex) {
+      spr.setTextColor(TFT_ORANGE, TFT_BLACK);
+      spr.printToSprite(String(" > ") + optsMenu[i]);
+    } else {
+      spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
+      spr.printToSprite(String("    ") + optsMenu[i]);
+    }
+  }
+  spr.unloadFont();
+}
+
+void dispalyMenuDisabled() {
+  spr.loadFont(MONOFONTO28);
+  for (int i = 0; i < ARRAY_SIZE(optsMenu); i++) {
+    tft.setCursor(30, 10 + i * spr.fontHeight());
+    if (i == selectorIndex) {
+      spr.setTextColor(TFT_BROWN, TFT_BLACK);
+      spr.printToSprite(String(" > ") + optsMenu[i]);
+    } else {
+      spr.setTextColor(TFT_DARKGREY, TFT_BLACK);
+      spr.printToSprite(String("    ") + optsMenu[i]);
+    }
+  }
+  spr.unloadFont();
+}
+
+void displayPart() {
+  spr.loadFont(MONOFONTO28);
+  tft.setCursor(200, 10);
+  if (selectorIndex == -1) {
+    spr.setTextColor(TFT_ORANGE, TFT_BLACK);
+    spr.printToSprite(String(" > back"));
+  } else {
+    spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
+    spr.printToSprite(String("    back"));
+  }
+
+  // Serial.println(partList.size());
+  for (int i = 0; i < parts.size(); i++) {
+    // Serial.println(partList[i]["name"].as<String>());
+    tft.setCursor(200, 10 + ((i + 1) * spr.fontHeight()));
+    if (i == selectorIndex) {
+      spr.setTextColor(TFT_ORANGE, TFT_BLACK);
+      spr.printToSprite(String(" > ") + parts[i]["name"].as<String>());
+    } else {
+      spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
+      spr.printToSprite(String("    ") + parts[i]["name"].as<String>());
+    }
+  }
+  spr.unloadFont();
+}
+
+void displayMainFrame() {
+  spr.loadFont(MONOFONTO20);
+  spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
+  tft.setCursor(10, 10);
+  spr.printToSprite(String(dateTimeStart()));
+  
+  spr.unloadFont();
+  spr.loadFont(MONOFONTO28);
+  spr.setTextColor(TFT_ORANGE, TFT_BLACK);
+  tft.setCursor(10, 10 + (1 * spr.fontHeight()));
+  spr.printToSprite(partName);
+  tft.setCursor(10, 10 + (2 * spr.fontHeight()));
+  spr.printToSprite(String(partStd, 2));
+  spr.unloadFont();
+  
+  spr.loadFont(MONOFONTO96);
+  spr.setTextColor(TFT_ORANGE, TFT_BLACK);
+  tft.setCursor(372, 120);
+  spr.printToSprite("gr");
+  spr.deleteSprite();
+  spr.unloadFont();
+}
+
+void displayMain(float sc) {
+  spr.loadFont(MONOFONTO96);
+  spr.createSprite(372, 96);
+  spr.setTextDatum(TR_DATUM);
+  spr.setTextColor(TFT_WHITE, TFT_BLACK);
+  spr.fillSprite(TFT_BLACK);
+  spr.drawFloat(sc, 2, 360, 0);
+  spr.pushSprite(0, 120);
+  spr.unloadFont();
+}
+
+void displayCheckStatus() {
+  spr.loadFont(MONOFONTO96);
+  spr.createSprite(108, 96);
+  spr.setTextDatum(TL_DATUM);
+  if (CHECK_STATUS != 0) {
+    spr.fillSprite(TFT_BLACK);
+    if (CHECK_STATUS == 1) {
+      spr.setTextColor(TFT_GREEN, TFT_BLACK);
+      spr.drawString("OK", 0, 0);
+    } else if (CHECK_STATUS == 2) {
+      spr.setTextColor(TFT_RED, TFT_BLACK);
+      spr.drawString("NG", 0, 0);
+    }
+    spr.pushSprite(372, 216);
+    delay(2000);
+  } else {
+    spr.fillSprite(TFT_BLACK);
+    spr.pushSprite(372, 216);
+  }
+  spr.deleteSprite();
+  spr.unloadFont();
+}
+
+void displayHeader(String text) {
+  spr.loadFont(MONOFONTO28);
+  spr.createSprite(480, spr.fontHeight());
+  spr.setTextDatum(TC_DATUM);
+  spr.setTextColor(TFT_WHITE, TFT_BLACK);
+  spr.fillSprite(TFT_BLACK);
+  spr.drawString(text, 240, 0);
+  spr.pushSprite(0, 40);
+  tft.drawFastHLine(0, 80, 480, TFT_WHITE);
+  spr.deleteSprite();
+  spr.unloadFont();
+}
+
+void displayOption() {
+  spr.loadFont(MONOFONTO28);
+  spr.createSprite(480, spr.fontHeight());
+  spr.setTextDatum(TC_DATUM);
+  for (int i = 0; i < ARRAY_SIZE(optsOption); i++) {
+    if (i == selectorIndex) {
+      spr.setTextColor(TFT_ORANGE, TFT_BLACK);
+      spr.fillSprite(TFT_BLACK);
+      spr.drawString(optsOption[i], 240, 0);
+      spr.pushSprite(0, 100 + (i * 40));
+    } else {
+      spr.setTextColor(TFT_WHITE, TFT_BLACK);
+      spr.fillSprite(TFT_BLACK);
+      spr.drawString(optsOption[i], 240, 0);
+      spr.pushSprite(0, 100 + (i * 40));
+    }
+  }
+  spr.deleteSprite();
+  spr.unloadFont();
+}
+
+void displayExitDialog() {
+  spr.loadFont(MONOFONTO28);
+  spr.createSprite(480, spr.fontHeight());
+  spr.setTextDatum(TC_DATUM);
+  for (int i = 0; i < ARRAY_SIZE(optsExitDialog); i++) {
+    if (i == selectorIndex) {
+      spr.setTextColor(TFT_ORANGE, TFT_BLACK);
+      spr.fillSprite(TFT_BLACK);
+      spr.drawString(optsExitDialog[i], 240, 0);
+      spr.pushSprite(0, 100 + (i * 40));
+    } else {
+      spr.setTextColor(TFT_WHITE, TFT_BLACK);
+      spr.fillSprite(TFT_BLACK);
+      spr.drawString(optsExitDialog[i], 240, 0);
+      spr.pushSprite(0, 100 + (i * 40));
+    }
+  }
+  spr.deleteSprite();
+  spr.unloadFont();
+}
+
+void displaySettings() {
+  spr.loadFont(MONOFONTO28);
+  tft.setCursor(200, 10);
+  if (selectorIndex == -1) {
+    spr.setTextColor(TFT_ORANGE, TFT_BLACK);
+    spr.printToSprite(String(" > back"));
+  } else {
+    spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
+    spr.printToSprite(String("    back"));
+  }
+
+  // Serial.println(partList.size());
+  for (int i = 0; i < ARRAY_SIZE(optsSettings); i++) {
+    // Serial.println(partList[i]["name"].as<String>());
+    tft.setCursor(200, 10 + ((i + 1) * spr.fontHeight()));
+    if (i == selectorIndex) {
+      spr.setTextColor(TFT_ORANGE, TFT_BLACK);
+      spr.printToSprite(String(" > ") + optsSettings[i]);
+    } else {
+      spr.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
+      spr.printToSprite(String("    ") + optsSettings[i]);
+    }
+  }
+  spr.unloadFont();
+}
+
+bool constrainer(int *newPosition, int min, int arrSize) {
+  bool state = false;
+  selectorIndex = constrain(*newPosition, min, arrSize - 1);
+  if (selectorIndex != lastSelectorIndex) {
+    lastSelectorIndex = selectorIndex;
+    state = true;
+  } else if (selectorIndex == arrSize - 1) {
+    *newPosition = selectorIndex;
+    encoder.write(selectorIndex * 2);
+  } else if (selectorIndex == min) {
+    *newPosition = 0;
+    encoder.write(0);
+  }
+  return state;
+}
+
+bool checkStableState(float wt) {
+  if (wt >= wt - HYSTERESIS_STABLE_CHECK && wt <= wt + HYSTERESIS_STABLE_CHECK && abs(wt - lastWeight) <= HYSTERESIS_STABLE_CHECK) {
+  // if (abs(wt - lastWeight) < HYSTERESIS_STABLE_CHECK) {
+    stableReadingsCount++;
+  } else {
+    stableReadingsCount = 0;
+  }
+  lastWeight = wt;
+    
+  return stableReadingsCount >= STABLE_READING_REQUIRED;
+}
+
+void rotarySelector() {
+  int newPosition = encoder.read() / 2;
+  if (newPosition != selectorIndex) {
+    switch(page1Name) {
+      case 0: // menu
+        switch(page2Name) {
+          default:  // menu selection
+            if (constrainer(&newPosition, 0, ARRAY_SIZE(optsMenu))) {
+              displayMenu();
+            }
+            break;
+          case 0:   // start
+            switch(page3Name) {
+              default:  // part selection
+                if (constrainer(&newPosition, -1, parts.size())) {
+                  displayPart();
+                }
+                break;
+              case 0:   // main
+                displayMain(getScale());
+                break;
+              case 1:   // options
+                if (constrainer(&newPosition, 0, ARRAY_SIZE(optsOption))) {
+                  displayOption();
+                }
+                break;
+              case 2:   // exit dialog
+                if (constrainer(&newPosition, 0, ARRAY_SIZE(optsExitDialog))) {
+                  displayExitDialog();
+                }
+                break;
+            }
+            break;
+          case 1:   // settings
+            switch(page3Name) {
+              default:  // settings selection
+                if (constrainer(&newPosition, -1, parts.size())) {
+                  displaySettings();
+                }
+                break;
+              case 0:   // Connect To WiFi
+                // displayMain(getScale());
+                break;
+              case 1:   // WiFi Station Mode
+                // if (constrainer(&newPosition, 0, ARRAY_SIZE(optsOption))) {
+                //   displayOption();
+                // }
+                break;
+              case 2:   // Serial Port
+                // if (constrainer(&newPosition, 0, ARRAY_SIZE(optsExitDialog))) {
+                //   displayExitDialog();
+                // }
+                break;
+            }
+            break;
+        }
+        break;
+    }
+  }
+  else if (page1Name == 0 && page2Name == 0 && page3Name == 0) {
+    float weight = getScale();
+    displayMain(weight);
+
+    if (checkStableState(weight)) {
+      // if (weight >= 0 - HYSTERESIS && weight <= 0 + HYSTERESIS) {
+      if (weight <= partStd * 0.1f) {
+        CHECK_STATUS = 0;
+      } else if (weight >= partStd - HYSTERESIS && weight <= partStd + HYSTERESIS && CHECK_STATUS == 0) {
+        CHECK_STATUS = 1;
+        // beep.OK();
+      } else if (CHECK_STATUS == 0) {
+        CHECK_STATUS = 2;
+        // beep.NG();
+      }
+      displayCheckStatus();
+    }
+  }
+}
+
+void rotaryButton() {
+  if (digitalRead(ENCODER_BUTTON_PIN) == LOW) {
+    encoder.write(0);
+    switch(page1Name) {
+      case 0: // menu
+        switch(page2Name) {
+          default:  // menu selection
+            switch (selectorIndex){
+              case 0:
+                selectorIndex = 0;
+                dispalyMenuDisabled();
+                displayPart();
+                page2Name = 0;
+                break;
+              case 1:
+                break;
+            }
+            break;
+          case 0:   // start
+            switch(page3Name) {
+              default:  // part selection
+                if (selectorIndex == -1) {
+                  selectorIndex = 0;
+                  tft.fillScreen(TFT_BLACK);
+                  displayMenu();
+                  page2Name = -1;
+                } else {
+                  tft.fillScreen(TFT_BLACK);
+                  partName = parts[selectorIndex]["name"].as<String>();
+                  partStd = parts[selectorIndex]["std"].as<float>();
+                  selectorIndex = 0;
+                  displayMainFrame();
+                  displayMain(getScale());
+                  page3Name = 0;
+                }
+                break;
+              case 0:   //main
+                selectorIndex = 0;
+                tft.fillScreen(TFT_BLACK);
+                displayHeader("OPTIONS");
+                displayOption();
+                page3Name = 1;
+                break;
+              case 1:   // options
+                switch (selectorIndex) {
+                  case 0:   // continue
+                    selectorIndex = 0;
+                    tft.fillScreen(TFT_BLACK);
+                    displayMainFrame();
+                    displayMain(getScale());
+                    page3Name = 0;
+                    break;
+                  case 1:   // tare
+                    {
+                      boolean _resume = false;
+                      while (_resume == false) {
+                        LoadCell.update();
+                        LoadCell.tareNoDelay();
+                        
+                        if (LoadCell.getTareStatus() == true) {
+                          Serial.println("Tare complete");
+                          _resume = true;
+                        }
+                      }
+                      selectorIndex = 0;
+                      tft.fillScreen(TFT_BLACK);
+                      displayMainFrame();
+                      displayMain(getScale());
+                      page3Name = 0;
+                    }
+                    break;
+                  case 2:   // exit
+                    selectorIndex = 0;
+                    tft.fillScreen(TFT_BLACK);
+                    displayHeader("Are you sure?");
+                    displayExitDialog();
+                    page3Name = 2;
+                    break;
+                }
+                break;
+              case 2:   // exit dialog
+                switch (selectorIndex) {
+                  case 0:   // continue
+                    selectorIndex = 0;
+                    tft.fillScreen(TFT_BLACK);
+                    displayMainFrame();
+                    displayMain(getScale());
+                    page3Name = 0;
+                    break;
+                  case 1:   // exit
+                    selectorIndex = 0;
+                    tft.fillScreen(TFT_BLACK);
+                    displayMenu();
+                    page1Name = 0;
+                    page2Name = -1;
+                    page3Name = -1;
+                    break;
+                }
+                break;
+            }
+            break;
+          case 1:   // settings
+            switch(page3Name) {
+              default:  // settings selection
+                if (selectorIndex == -1) {
+                  selectorIndex = 0;
+                  tft.fillScreen(TFT_BLACK);
+                  displayMenu();
+                  page2Name = -1;
+                } else {
+                  tft.fillScreen(TFT_BLACK);
+                  // partName = parts[selectorIndex]["name"].as<String>();
+                  // partStd = parts[selectorIndex]["std"].as<float>();
+                  // 
+                  selectorIndex = 0;
+                  // displayMainFrame();
+                  // displayMain(getScale());
+                  page3Name = 0;
+                }
+                break;
+            }
+            break;
+        }
+        break;
+    }
+    selectorIndex = 0;
+    lastSelectorIndex = -1;
+    delay(500);
+  }
 }
 
 boolean initWifi() {
