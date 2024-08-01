@@ -11,12 +11,19 @@
 #include <RTClib.h>
 #include <HX711_ADC.h>
 #include "TFT_eSPI.h"
+#include <esp32-hal-cpu.h>
+#include "soc/rtc.h"
 
 #define HYSTERESIS 5.0f
+#define HYSTERESIS_KG 0.01f
 #define HYSTERESIS_STABLE_CHECK 1.0f
-#define STABLE_READING_REQUIRED 20
+#define STABLE_READING_REQUIRED 64
+
 float lastWeight = 0.0f;
 int stableReadingsCount = 0;
+float stableWeight = 0.0f;
+boolean startCountNewData = false;
+int countNewData = 0;
 
 #define MONOFONTO20 monofonto20
 #define MONOFONTO28 monofonto28
@@ -473,6 +480,9 @@ float getScale() {
       Serial.println(weight);
       newDataReady = 0;
       t = millis();
+      if (startCountNewData) {
+        countNewData++;
+      }
     }
   }
 
@@ -863,7 +873,13 @@ void displayMain(float sc) {
   spr.setTextDatum(TR_DATUM);
   spr.setTextColor(TFT_WHITE, TFT_BLACK);
   spr.fillSprite(TFT_BLACK);
-  spr.drawFloat(sc, 2, 360, 0);
+
+  if (partUnit == "kg") {
+    spr.drawFloat(sc, 2, 360, 0);
+  } else if (partUnit == "gr") {
+    spr.drawNumber((int)sc, 360, 0);
+  }
+
   spr.pushSprite(0, 120);
   spr.unloadFont();
 }
@@ -882,7 +898,6 @@ void displayCheckStatus() {
       spr.drawString("NG", 0, 0);
     }
     spr.pushSprite(372, 216);
-    delay(2000);
   } else {
     spr.fillSprite(TFT_BLACK);
     spr.pushSprite(372, 216);
@@ -1033,15 +1048,23 @@ bool constrainer(int *newPosition, int min, int arrSize) {
 }
 
 bool checkStableState(float wt) {
-  if (wt >= wt - HYSTERESIS_STABLE_CHECK && wt <= wt + HYSTERESIS_STABLE_CHECK && abs(wt - lastWeight) <= HYSTERESIS_STABLE_CHECK) {
+  float hys = 0.0;
+  if (partUnit == "kg") {
+    hys = HYSTERESIS_STABLE_CHECK / 1000.0;
+  } else {
+    hys = HYSTERESIS_STABLE_CHECK;
+  }
+  if (wt >= wt - hys && wt <= wt + hys && abs(wt - lastWeight) <= hys) {
   // if (abs(wt - lastWeight) < HYSTERESIS_STABLE_CHECK) {
+    startCountNewData = true;
     stableReadingsCount++;
   } else {
     stableReadingsCount = 0;
+    countNewData = 0;
   }
   lastWeight = wt;
     
-  return stableReadingsCount >= STABLE_READING_REQUIRED;
+  return (stableReadingsCount >= STABLE_READING_REQUIRED && countNewData >= STABLE_READING_REQUIRED);
 }
 
 void rotarySelector() {
@@ -1105,19 +1128,39 @@ void rotarySelector() {
   }
   else if (page1Name == 0 && page2Name == 0 && page3Name == 0) {
     float weight = getScale();
+    if (partUnit == "kg") {
+      weight = weight / 1000.0;
+    }
+    
     displayMain(weight);
 
     if (checkStableState(weight)) {
       // if (weight >= 0 - HYSTERESIS && weight <= 0 + HYSTERESIS) {
+      float hys = 0.0;
+      if (partUnit == "kg") {
+        hys = HYSTERESIS_KG;
+      } else {
+        hys = HYSTERESIS;
+      }
+
       if (weight <= partStd * 0.1f) {
         CHECK_STATUS = 0;
-      } else if (weight >= partStd - HYSTERESIS && weight <= partStd + HYSTERESIS && CHECK_STATUS == 0) {
+        stableWeight = 0.0;
+      } else if (weight >= partStd - hys && weight <= partStd + hys && CHECK_STATUS == 0) {
         CHECK_STATUS = 1;
+        stableWeight = weight;
         // beep.OK();
       } else if (CHECK_STATUS == 0) {
         CHECK_STATUS = 2;
+        stableWeight = weight;
         // beep.NG();
       }
+      displayCheckStatus();
+      countNewData = 0;
+      startCountNewData = false;
+    } else if (stableWeight != 0.0 && (weight <= stableWeight * 0.9f || weight >= stableWeight * 1.1f)) {
+      CHECK_STATUS = 0;
+      stableWeight = 0.0;
       displayCheckStatus();
     }
   }
@@ -1287,6 +1330,7 @@ void rotaryButton() {
 }
 
 void setup() {
+  setCpuFrequencyMhz(80);
   Serial.begin(9600);
 
   rtcInit();
