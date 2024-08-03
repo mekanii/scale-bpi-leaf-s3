@@ -42,8 +42,8 @@ int countNewData = 0;
 #define HX711_DT 35
 #define HX711_SCK 45
 
-#define WIFI_SSID "creati"
-#define WIFI_PASS "qwertyui"
+#define WIFI_SSID "Zain Berkah Kost"
+#define WIFI_PASS "ZBerkah2024"
 #define SSID "BPI-LEAF-S3_01"
 #define PASS "12345678"
 
@@ -463,6 +463,27 @@ void scaleBegin() {
   initScale();
 }
 
+bool checkStableState(float wt, String unit) {
+  float hys = 0.0;
+  if (unit == "kg") {
+    hys = HYSTERESIS_STABLE_CHECK / 1000.0;
+  } else {
+    hys = HYSTERESIS_STABLE_CHECK;
+  }
+
+  if (wt >= wt - hys && wt <= wt + hys && abs(wt - lastWeight) <= hys) {
+  // if (abs(wt - lastWeight) < HYSTERESIS_STABLE_CHECK) {
+    startCountNewData = true;
+    stableReadingsCount++;
+  } else {
+    stableReadingsCount = 0;
+    countNewData = 0;
+  }
+  lastWeight = wt;
+    
+  return (stableReadingsCount >= STABLE_READING_REQUIRED && countNewData >= STABLE_READING_REQUIRED);
+}
+
 float getScale() {
   static boolean newDataReady = 0;
 
@@ -498,6 +519,53 @@ float getScale() {
   // if (LoadCell.getTareStatus() == true) {
   //   Serial.println("Tare complete");
   // }
+}
+
+DynamicJsonDocument getScale2(){
+  float weight = getScale();
+  if (partUnit == "kg") {
+    weight = weight / 1000.0;
+  }
+
+  if (checkStableState(weight, partUnit)) {
+    // if (weight >= 0 - HYSTERESIS && weight <= 0 + HYSTERESIS) {
+    float hys = 0.0;
+    if (partUnit == "kg") {
+      hys = HYSTERESIS_KG;
+    } else {
+      hys = HYSTERESIS;
+    }
+
+    if (partUnit == "kg" && weight <= 0.01f) {
+      CHECK_STATUS = 0;
+      stableWeight = 0.0;
+    } else if (partUnit == "gr" && weight <= 2.0f) {
+      CHECK_STATUS = 0;
+      stableWeight = 0.0;
+    } else if (weight >= partStd - hys && weight <= partStd + hys && CHECK_STATUS == 0) {
+      CHECK_STATUS = 1;
+      stableWeight = weight;
+      // beep.OK();
+    } else if (CHECK_STATUS == 0) {
+      CHECK_STATUS = 2;
+      stableWeight = weight;
+      // beep.NG();
+    }
+    // displayCheckStatus();
+    countNewData = 0;
+    startCountNewData = false;
+  } else if (stableWeight != 0.0 && (weight <= stableWeight * 0.9f || weight >= stableWeight * 1.1f)) {
+    CHECK_STATUS = 0;
+    stableWeight = 0.0;
+    // displayCheckStatus();
+  }
+
+  // displayMain(weight);
+  // TODO: return weight and CHECK_STATUS
+  DynamicJsonDocument responseDoc(1024);
+  responseDoc["weight"] = weight;
+  responseDoc["check"] = CHECK_STATUS;
+  return responseDoc;
 }
 
 bool initCalibration() {
@@ -552,6 +620,20 @@ float createCalibrationFactor(float knownWeight) {
   Serial.println("***");
 
   return newCalibrationFactor;
+}
+
+float getStableWeight() {
+  float data = 0.0;
+  boolean stable = false;
+  while (!stable) {
+    float newWeight = getScale();
+    if (checkStableState(newWeight, "gr")) {
+      data = newWeight;
+      stable = true;
+    }
+  }
+
+  return data;
 }
 /////////////////////////////////////////////////////////////////////
 
@@ -673,11 +755,36 @@ void handleUpdatePart() {
   server.send(200, "application/json", response);
 }
 
-void handleGetScale() {
-  float data = getScale();
+void handleTare() {
+  tareScale();
 
   DynamicJsonDocument responseDoc(1024);
   String response;
+
+  responseDoc["data"] = nullptr;
+  responseDoc["message"] = "Tare success";
+  responseDoc["status"] = 200;
+  serializeJson(responseDoc, response);
+  server.send(200, "application/json", response);
+}
+
+void handleGetScale() {
+  DynamicJsonDocument responseDoc(1024);
+  String response;
+
+  if (!server.hasArg("std") || !server.hasArg("unit")) {
+    responseDoc["data"] = nullptr;
+    responseDoc["message"] = "Missing parameters";
+    responseDoc["status"] = 400;
+    serializeJson(responseDoc, response);
+    server.send(400, "application/json", response);
+    return;
+  }
+  
+  partStd = server.arg("std").toFloat();
+  partUnit = server.arg("unit");
+
+  DynamicJsonDocument data = getScale2();
 
   responseDoc["data"] = data;
   responseDoc["message"] = "Scale retrieved successfully";
@@ -724,6 +831,19 @@ void handleCreateCalibrationFactor() {
   server.send(200, "application/json", response);
 }
 
+void handleGetStableWeight() {
+  DynamicJsonDocument responseDoc(1024);
+  String response;
+
+  float data = getStableWeight();
+
+  responseDoc["data"] = data;
+  responseDoc["message"] = "Scale retrieved successfully";
+  responseDoc["status"] = 200;
+  serializeJson(responseDoc, response);
+  server.send(200, "application/json", response);
+}
+
 void initServer() {
   server.on("/parts", HTTP_GET, handleGetPartList);
   server.on("/parts/", HTTP_GET, handleGetPart);
@@ -731,11 +851,15 @@ void initServer() {
   server.on("/parts/", HTTP_DELETE, handleDeletePart);
   server.on("/parts/", HTTP_PUT, handleUpdatePart);
 
-  server.on("/scale", HTTP_GET, handleUpdatePart);
+  server.on("/scale", HTTP_POST, handleGetScale);
+  
+  server.on("/tare", HTTP_GET, handleTare);
 
   server.on("/initCalibration", HTTP_GET, handleInitCalibration);
   
   server.on("/calibrationFactor", HTTP_POST, handleCreateCalibrationFactor);
+
+  server.on("/getStableWeight", HTTP_GET, handleGetStableWeight);
 
   server.begin();
 
@@ -1047,26 +1171,6 @@ bool constrainer(int *newPosition, int min, int arrSize) {
   return state;
 }
 
-bool checkStableState(float wt) {
-  float hys = 0.0;
-  if (partUnit == "kg") {
-    hys = HYSTERESIS_STABLE_CHECK / 1000.0;
-  } else {
-    hys = HYSTERESIS_STABLE_CHECK;
-  }
-  if (wt >= wt - hys && wt <= wt + hys && abs(wt - lastWeight) <= hys) {
-  // if (abs(wt - lastWeight) < HYSTERESIS_STABLE_CHECK) {
-    startCountNewData = true;
-    stableReadingsCount++;
-  } else {
-    stableReadingsCount = 0;
-    countNewData = 0;
-  }
-  lastWeight = wt;
-    
-  return (stableReadingsCount >= STABLE_READING_REQUIRED && countNewData >= STABLE_READING_REQUIRED);
-}
-
 void rotarySelector() {
   int newPosition = encoder.read() / 2;
   if (newPosition != selectorIndex) {
@@ -1134,7 +1238,7 @@ void rotarySelector() {
     
     displayMain(weight);
 
-    if (checkStableState(weight)) {
+    if (checkStableState(weight, partUnit)) {
       // if (weight >= 0 - HYSTERESIS && weight <= 0 + HYSTERESIS) {
       float hys = 0.0;
       if (partUnit == "kg") {
