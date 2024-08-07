@@ -2,11 +2,22 @@
 
 ## Overview
 
-`scale-bpi-leaf-s3` is a project developed by mekanii that utilizes an ESP32 microcontroller to create a smart scale with WiFi connectivity. The project includes a web server to handle various API endpoints for managing parts and scale operations. All necessary libraries are included in the `/lib` directory, so no additional installation is required.
+`scale-bpi-leaf-s3` is a project developed by mekanii that utilizes an BPI-LEAF-S3 microcontroller to create a smart scale with WiFi connectivity. The project includes a web server to handle various API endpoints for managing parts and scale operations. All necessary libraries are included in the `/lib` directory, so no additional installation is required.
+
+## Usage
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/mekanii/scale-bpi-leaf-s3.git
+   ```
+2. Open the project in PlatformIO.
+3. Ensure your hardware is connected correctly.
+4. Build and upload the project to your BPI-LEAF-S3 board.
+5. Access the web server via the IP address displayed on the TFT screen.
 
 ## Hardware Used
 
-- **ESP32 Development Board**: The main microcontroller used for this project.
+- **BPI-LEAF-S3 Development Board**: The main microcontroller used for this project.
 - **HX711 Load Cell Amplifier**: Used to interface with the load cell.
 - **Load Cell**: The sensor used to measure weight.
 - **TFT Display**: For displaying information such as weight, status, and menu options.
@@ -16,62 +27,32 @@
 
 ### Hardware Connections
 
-1. **HX711 to ESP32**
+1. **HX711 to BPI-LEAF-S3**
    - **DT (Data)**: Connect to GPIO 18
    - **SCK (Clock)**: Connect to GPIO 19
 2. **Load Cell to HX711**
    - Follow the HX711 module's pinout to connect the load cell.
-
-## Directory Structure
-
-```
-scale-bpi-leaf-s3/
-├── lib/
-│   ├── WiFi/
-│   ├── WebServer/
-│   ├── ArduinoJson/
-│   ├── TFT_eSPI/
-│   ├── HX711_ADC/
-│   ├── RTClib/
-│   └── Encoder/
-├── src/
-│   ├── main.cpp
-│   ├── WiFiManager.cpp
-│   ├── WiFiManager.h
-│   ├── ScaleManager.cpp
-│   ├── ScaleManager.h
-│   ├── DisplayManager.cpp
-│   ├── DisplayManager.h
-│   ├── PartManager.cpp
-│   ├── PartManager.h
-├── platformio.ini
-└── README.md
-```
+3. **Rotary Encoder to BPI-LEAF-S3**
+   - **CLK (Clock)**: Connect to GPIO 32
+   - **DT (Data)**: Connect to GPIO 33
+   - **SW (Switch)**: Connect to GPIO 25
 
 ## Parameters to be Set in Code
 
-### WiFiManager.h
+### WiFi Parameters
 
 - **WIFI_SSID**: The SSID of the WiFi network to connect to.
 - **WIFI_PASS**: The password of the WiFi network.
+- **SSID**: The SSID of the access point created by the BPI-LEAF-S3.
+- **PASS**: The password for the access point created by the BPI-LEAF-S3.
 
-### ScaleManager.h
 
-- **HX711_DT**: The data pin for the HX711.
-- **HX711_SCK**: The clock pin for the HX711.
+### Scale Parameters
+
 - **HYSTERESIS_STABLE_CHECK**: The hysteresis value for stable weight check.
 - **HYSTERESIS_KG**: The hysteresis value for kilograms.
 - **HYSTERESIS**: The hysteresis value for grams.
 - **STABLE_READING_REQUIRED**: The number of stable readings required.
-
-### DisplayManager.h
-
-- **MONOFONTO28**: Font for the display.
-- **MONOFONTO96**: Font for the display.
-
-### PartManager.h
-
-- **PART_LIST_FILE**: The file path for storing the part list.
 
 ## API Endpoints
 
@@ -258,18 +239,3 @@ Retrieve the stable weight from the scale.
   "status": 200
 }
 ```
-
-## Usage
-
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/mekanii/scale-bpi-leaf-s3.git
-   ```
-2. Open the project in PlatformIO.
-3. Ensure your hardware is connected correctly.
-4. Build and upload the project to your ESP32 board.
-5. Access the web server via the IP address displayed on the TFT screen.
-
-## License
-
-This project is licensed under the MIT License.
