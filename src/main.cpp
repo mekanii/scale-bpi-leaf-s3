@@ -1205,15 +1205,14 @@ void rotarySelector() {
     }
   }
   else if (page1Name == 0 && page2Name == 0 && page3Name == 0) {
-    float weight = getScale();
+    float wt = getScale();
     if (partUnit == "kg") {
-      weight = weight / 1000.0;
+      wt = wt / 1000.0;
     }
     
     displayMain(weight);
 
-    if (checkStableState(weight, partUnit)) {
-      // if (weight >= 0 - HYSTERESIS && weight <= 0 + HYSTERESIS) {
+    if (checkStableState(wt, partUnit)) {
       float hys = 0.0;
       if (partUnit == "kg") {
         hys = HYSTERESIS_KG;
@@ -1221,20 +1220,21 @@ void rotarySelector() {
         hys = HYSTERESIS;
       }
 
-      if (weight <= partStd * 0.1f) {
+      if (partUnit == "kg" && wt <= 0.01f) {
         CHECK_STATUS = 0;
         stableWeight = 0.0;
-      } else if (weight >= partStd - hys && weight <= partStd + hys && CHECK_STATUS == 0) {
+      } else if (partUnit == "gr" && wt <= 2.0f) {
+        CHECK_STATUS = 0;
+        stableWeight = 0.0;
+      } else if (wt >= partStd - hys && wt <= partStd + hys && CHECK_STATUS == 0) {
         CHECK_STATUS = 1;
-        stableWeight = weight;
-        // beep.OK();
+        stableWeight = wt;
       } else if (CHECK_STATUS == 0) {
         CHECK_STATUS = 2;
-        stableWeight = weight;
-        // beep.NG();
+        stableWeight = wt;
       }
       displayCheckStatus();
-    } else if (stableWeight != 0.0 && (weight <= stableWeight * 0.9f || weight >= stableWeight * 1.1f)) {
+    } else if (stableWeight != 0.0 && (wt <= stableWeight * 0.9f || wt >= stableWeight * 1.1f)) {
       CHECK_STATUS = 0;
       stableWeight = 0.0;
       displayCheckStatus();
@@ -1279,7 +1279,7 @@ void rotaryButton() {
                   partUnit = parts[selectorIndex]["unit"].as<String>();
                   selectorIndex = 0;
                   
-                  initScale();
+                  // initScale();
                   tareScale();
 
                   displayMainFrame();
