@@ -1,9 +1,11 @@
 # scale-bpi-leaf-s3
 
 ## Overview
+
 `scale-bpi-leaf-s3` is a project developed by mekanii that utilizes an ESP32 microcontroller to create a smart scale with WiFi connectivity. The project includes a web server to handle various API endpoints for managing parts and scale operations. All necessary libraries are included in the `/lib` directory, so no additional installation is required.
 
 ## Hardware Used
+
 - **ESP32 Development Board**: The main microcontroller used for this project.
 - **HX711 Load Cell Amplifier**: Used to interface with the load cell.
 - **Load Cell**: The sensor used to measure weight.
@@ -11,6 +13,14 @@
 - **Rotary Encoder**: For user input and navigation through the menu.
 - **RTC Module**: For keeping track of time.
 - **Push Button**: For additional user input.
+
+### Hardware Connections
+
+1. **HX711 to ESP32**
+   - **DT (Data)**: Connect to GPIO 18
+   - **SCK (Clock)**: Connect to GPIO 19
+2. **Load Cell to HX711**
+   - Follow the HX711 module's pinout to connect the load cell.
 
 ## Directory Structure
 
@@ -72,11 +82,15 @@ Retrieve the list of parts.
 **Response:**
 ```json
 {
-  "partList": [
-    { "id": 1, "name": "PART 01", "std": 100.00, "unit": "gr" },
-    { "id": 2, "name": "PART 02", "std": 500.00, "unit": "gr" },
-    { "id": 3, "name": "PART 03", "std": 1.25, "unit": "kg" }
-  ]
+  "data": {
+    "partList": [
+      { "id": 1, "name": "PART 01", "std": 100.00, "unit": "gr" },
+      { "id": 2, "name": "PART 02", "std": 500.00, "unit": "gr" },
+      { "id": 3, "name": "PART 03", "std": 1.25, "unit": "kg" }
+    ]
+  },
+  "message": "Parts retrieved successfully",
+  "status": 200
 }
 ```
 
@@ -87,10 +101,14 @@ Retrieve a specific part by ID.
 **Response:**
 ```json
 {
-  "id": 1,
-  "name": "PART 01",
-  "std": 100.00,
-  "unit": "gr"
+  "data": {
+    "id": 1,
+    "name": "PART 01",
+    "std": 100.00,
+    "unit": "gr"
+  },
+  "message": "Part retrieved successfully",
+  "status": 200
 }
 ```
 
@@ -110,10 +128,14 @@ Create a new part.
 **Response:**
 ```json
 {
-  "id": 4,
-  "name": "PART 04",
-  "std": 200.00,
-  "unit": "gr"
+  "data": {
+    "id": 4,
+    "name": "PART 04",
+    "std": 200.00,
+    "unit": "gr"
+  },
+  "message": "Part created successfully",
+  "status": 201
 }
 ```
 
@@ -124,7 +146,9 @@ Delete a part by ID.
 **Response:**
 ```json
 {
-  "message": "Part deleted successfully"
+  "data": null,
+  "message": "Part deleted successfully",
+  "status": 200
 }
 ```
 
@@ -144,10 +168,14 @@ Update a part by ID.
 **Response:**
 ```json
 {
-  "id": 1,
-  "name": "PART 01",
-  "std": 150.00,
-  "unit": "gr"
+  "data": {
+    "id": 1,
+    "name": "PART 01",
+    "std": 150.00,
+    "unit": "gr"
+  },
+  "message": "Part updated successfully",
+  "status": 200
 }
 ```
 
@@ -158,8 +186,12 @@ Retrieve the current weight from the scale.
 **Response:**
 ```json
 {
-  "weight": 123.45,
-  "unit": "gr"
+  "data": {
+    "weight": 123.45,
+    "unit": "gr"
+  },
+  "message": "Current weight retrieved successfully",
+  "status": 200
 }
 ```
 
@@ -170,7 +202,9 @@ Tare the scale.
 **Response:**
 ```json
 {
-  "message": "Scale tared successfully"
+  "data": null,
+  "message": "Scale tared successfully",
+  "status": 200
 }
 ```
 
@@ -181,7 +215,9 @@ Initialize the calibration process.
 **Response:**
 ```json
 {
-  "message": "Calibration initialized"
+  "data": null,
+  "message": "Calibration initialized",
+  "status": 200
 }
 ```
 
@@ -199,7 +235,11 @@ Set the calibration factor.
 **Response:**
 ```json
 {
-  "calFactor": 123.45
+  "data": {
+    "calFactor": 123.45
+  },
+  "message": "Calibration factor set successfully",
+  "status": 200
 }
 ```
 
@@ -210,14 +250,21 @@ Retrieve the stable weight from the scale.
 **Response:**
 ```json
 {
-  "stableWeight": 123.45,
-  "unit": "gr"
+  "data": {
+    "stableWeight": 123.45,
+    "unit": "gr"
+  },
+  "message": "Stable weight retrieved successfully",
+  "status": 200
 }
 ```
 
 ## Usage
 
-1. Clone the repository.
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/mekanii/scale-bpi-leaf-s3.git
+   ```
 2. Open the project in PlatformIO.
 3. Ensure your hardware is connected correctly.
 4. Build and upload the project to your ESP32 board.
