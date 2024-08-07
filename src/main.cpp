@@ -14,16 +14,23 @@
 #include <esp32-hal-cpu.h>
 #include "soc/rtc.h"
 
+#define HX711_DT 35
+#define HX711_SCK 45
+
+HX711_ADC LoadCell(HX711_DT, HX711_SCK);
+
 #define HYSTERESIS 5.0f
 #define HYSTERESIS_KG 0.01f
 #define HYSTERESIS_STABLE_CHECK 1.0f
-#define STABLE_READING_REQUIRED 64
+#define STABLE_READING_REQUIRED 32
 
+unsigned long t = 0;
+float weight = 0.00;
 float lastWeight = 0.0f;
 int stableReadingsCount = 0;
 float stableWeight = 0.0f;
-boolean startCountNewData = false;
-int countNewData = 0;
+boolean doCheckStableState = false;
+int CHECK_STATUS = 0;
 
 #define MONOFONTO20 monofonto20
 #define MONOFONTO28 monofonto28
@@ -38,27 +45,25 @@ int countNewData = 0;
 #define ENCODER_PIN_B 14
 #define ENCODER_BUTTON_PIN 46
 
-// Define pins for the Load Cell
-#define HX711_DT 35
-#define HX711_SCK 45
-
-#define WIFI_SSID "Zain Berkah Kost"
-#define WIFI_PASS "ZBerkah2024"
+#define WIFI_SSID "PemudaTanggapBerbagi_Lt1"
+#define WIFI_PASS "lantaisatutanpaspasi"
 #define SSID "BPI-LEAF-S3_01"
 #define PASS "12345678"
 
 const char* ssid = "BPI-LEAF-S3_01";
 const char* password = "12345678";
 
-String DEVICE_IP_ADDRESS = "";
-
 WebServer server(80);
+
+String DEVICE_IP_ADDRESS = "";
+boolean CONN_STATUS = false;
 
 DynamicJsonDocument doc(1024);
 JsonArray parts;
 
-HX711_ADC LoadCell(HX711_DT, HX711_SCK);
-unsigned long t = 0;
+String partName = "";
+float partStd = 0;
+String partUnit = "";
 
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite spr = TFT_eSprite(&tft);
@@ -75,13 +80,6 @@ int lastSelectorIndex = -1;
 int page1Name = -1;
 int page2Name = -1;
 int page3Name = -1;
-
-String partName = "";
-float partStd = 0;
-String partUnit = "";
-
-int CHECK_STATUS = 0;
-boolean CONN_STATUS = false;
 
 const char* optsMenu[2] = {
   "START",
@@ -104,8 +102,6 @@ const char* optsExitDialog[2] = {
   "No, CANCEL",
   "Yes, EXIT",
 };
-
-float weight = 0.00;
 
 void rtcInit() {
   // rtc.adjust(DateTime(2023, 2, 11, 18, 48, 0));
@@ -141,6 +137,7 @@ String dateTimeNow() {
   }
 }
 
+// BEGIN: PART MANAGER ///////////////////////////////////////////////////////////////////
 DynamicJsonDocument getPartList() {
   const size_t capacity = JSON_ARRAY_SIZE(9) + JSON_OBJECT_SIZE(9) + 400;
   doc.clear(); // Clear the document before use
@@ -273,7 +270,6 @@ void createPart(String name, float std, String unit) {
   Serial.println("unit: " + newPart["unit"].as<String>());
 }
 
-// Function to create partList.json with hardcoded content
 void createPartList() {
   // Define the JSON content
   const char* jsonContent = R"rawliteral(
@@ -342,7 +338,6 @@ void deletePart(int id) {
   file.close();
 }
 
-// Function to delete partList.json
 void deletePartList() {
   if (SPIFFS.exists("/partList.json")) {
     if (SPIFFS.remove("/partList.json")) {
@@ -395,15 +390,17 @@ void updatePart(int id, String name, float std, String unit) {
   serializeJson(temp, file);
   file.close();
 }
+// END: PART MANAGER ///////////////////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////////////////////////
+// BEGIN: SCALE MANAGER ///////////////////////////////////////////////////////////////////
 void tareScale() {
-  LoadCell.tareNoDelay();
-  while (!LoadCell.getTareStatus()) {
-    LoadCell.update();
-    delay(100);
-    Serial.println("Taring...");
-  }
+  // LoadCell.tareNoDelay();
+  // while (!LoadCell.getTareStatus()) {
+  //   LoadCell.update();
+  //   delay(100);
+  //   Serial.println("Taring...");
+  // }
+  LoadCell.tare();
   Serial.println("Tare complete");
 }
 
@@ -435,6 +432,8 @@ float getCalibrationFactor() {
 }
 
 void initScale() {
+  LoadCell.begin();
+  
   // preciscion right after power-up can be improved by adding a few seconds of stabilizing time
   unsigned long stabilizingtime = 2000;
 
@@ -457,78 +456,54 @@ void initScale() {
   while (!LoadCell.update());
 }
 
-void scaleBegin() {
-  LoadCell.begin();
-
-  initScale();
-}
-
 bool checkStableState(float wt, String unit) {
   float hys = 0.0;
-  if (unit == "kg") {
-    hys = HYSTERESIS_STABLE_CHECK / 1000.0;
-  } else {
-    hys = HYSTERESIS_STABLE_CHECK;
-  }
+  if (doCheckStableState) {
+    if (unit == "kg") {
+      hys = HYSTERESIS_STABLE_CHECK / 1000.0;
+    } else {
+      hys = HYSTERESIS_STABLE_CHECK;
+    }
 
-  if (wt >= wt - hys && wt <= wt + hys && abs(wt - lastWeight) <= hys) {
-  // if (abs(wt - lastWeight) < HYSTERESIS_STABLE_CHECK) {
-    startCountNewData = true;
-    stableReadingsCount++;
-  } else {
-    stableReadingsCount = 0;
-    countNewData = 0;
+    if (wt >= wt - hys && wt <= wt + hys && abs(wt - lastWeight) <= hys) {
+    // if (abs(wt - lastWeight) < HYSTERESIS_STABLE_CHECK) {
+      stableReadingsCount++;
+    } else {
+      stableReadingsCount = 0;
+    }
+    lastWeight = wt;
   }
-  lastWeight = wt;
+  doCheckStableState = false;
     
-  return (stableReadingsCount >= STABLE_READING_REQUIRED && countNewData >= STABLE_READING_REQUIRED);
+  return (stableReadingsCount >= STABLE_READING_REQUIRED);
 }
 
 float getScale() {
   static boolean newDataReady = 0;
 
-  //increase value to slow down serial print activity
-  const int serialPrintInterval = 0;
-
-  // check for new data/start next conversion:
   if (LoadCell.update()) newDataReady = true;
 
-  // get smoothed value from the dataset:
   if (newDataReady) {
-    if (millis() > t + serialPrintInterval) {
+    if (millis() > t) {
       weight = LoadCell.getData();
-      Serial.print("Load_cell output val: ");
-      Serial.println(weight);
+      // Serial.print("Load_cell output val: ");
+      // Serial.println(weight);
       newDataReady = 0;
       t = millis();
-      if (startCountNewData) {
-        countNewData++;
-      }
+      doCheckStableState = true;
     }
   }
 
   return weight;
-
-  // // receive command from serial terminal, send 't' to initiate tare operation:
-  // if (Serial.available() > 0) {
-  //   char inByte = Serial.read();
-  //   if (inByte == 't') LoadCell.tareNoDelay();
-  // }
-
-  // // check if last tare operation is complete:
-  // if (LoadCell.getTareStatus() == true) {
-  //   Serial.println("Tare complete");
-  // }
 }
 
 DynamicJsonDocument getScale2(){
-  float weight = getScale();
+  float wt = getScale();
   if (partUnit == "kg") {
-    weight = weight / 1000.0;
+    wt = wt / 1000.0;
   }
 
-  if (checkStableState(weight, partUnit)) {
-    // if (weight >= 0 - HYSTERESIS && weight <= 0 + HYSTERESIS) {
+  if (checkStableState(wt, partUnit)) {
     float hys = 0.0;
     if (partUnit == "kg") {
       hys = HYSTERESIS_KG;
@@ -536,34 +511,26 @@ DynamicJsonDocument getScale2(){
       hys = HYSTERESIS;
     }
 
-    if (partUnit == "kg" && weight <= 0.01f) {
+    if (partUnit == "kg" && wt <= 0.01f) {
       CHECK_STATUS = 0;
       stableWeight = 0.0;
-    } else if (partUnit == "gr" && weight <= 2.0f) {
+    } else if (partUnit == "gr" && wt <= 2.0f) {
       CHECK_STATUS = 0;
       stableWeight = 0.0;
-    } else if (weight >= partStd - hys && weight <= partStd + hys && CHECK_STATUS == 0) {
+    } else if (wt >= partStd - hys && wt <= partStd + hys && CHECK_STATUS == 0) {
       CHECK_STATUS = 1;
-      stableWeight = weight;
-      // beep.OK();
+      stableWeight = wt;
     } else if (CHECK_STATUS == 0) {
       CHECK_STATUS = 2;
-      stableWeight = weight;
-      // beep.NG();
+      stableWeight = wt;
     }
-    // displayCheckStatus();
-    countNewData = 0;
-    startCountNewData = false;
-  } else if (stableWeight != 0.0 && (weight <= stableWeight * 0.9f || weight >= stableWeight * 1.1f)) {
+  } else if (stableWeight != 0.0 && (wt <= stableWeight * 0.9f || wt >= stableWeight * 1.1f)) {
     CHECK_STATUS = 0;
     stableWeight = 0.0;
-    // displayCheckStatus();
   }
 
-  // displayMain(weight);
-  // TODO: return weight and CHECK_STATUS
   DynamicJsonDocument responseDoc(1024);
-  responseDoc["weight"] = weight;
+  responseDoc["weight"] = wt;
   responseDoc["check"] = CHECK_STATUS;
   return responseDoc;
 }
@@ -635,8 +602,9 @@ float getStableWeight() {
 
   return data;
 }
-/////////////////////////////////////////////////////////////////////
+// END: SCALE MANAGER ///////////////////////////////////////////////////////////////////
 
+// BEGIN: API HANDLER ///////////////////////////////////////////////////////////////////
 void handleGetPartList() {
   DynamicJsonDocument data = getPartList();
 
@@ -843,7 +811,9 @@ void handleGetStableWeight() {
   serializeJson(responseDoc, response);
   server.send(200, "application/json", response);
 }
+// END: API HANDLER ///////////////////////////////////////////////////////////////////
 
+// BEGIN: SERVER MANAGER //////////////////////////////////////////////////////////////
 void initServer() {
   server.on("/parts", HTTP_GET, handleGetPartList);
   server.on("/parts/", HTTP_GET, handleGetPart);
@@ -911,7 +881,9 @@ boolean wiFiStationMode() {
 
   return true;
 }
+// END: SERVER MANAGER ///////////////////////////////////////////////////////////////////
 
+// BEGIN: DISPLAY MANAGER //////////////////////////////////////////////////////////////
 void displayMenu() {
   spr.loadFont(MONOFONTO28);
   for (int i = 0; i < ARRAY_SIZE(optsMenu); i++) {
@@ -1154,7 +1126,9 @@ void displayFailedWiFi() {
   spr.printToSprite("FAILED TO INITIALIZE WIFI");
   spr.unloadFont();
 }
+// END: DISPLAY MANAGER //////////////////////////////////////////////////////////////////
 
+// BEGIN: ENCODER MANAGER ////////////////////////////////////////////////////////////////
 bool constrainer(int *newPosition, int min, int arrSize) {
   bool state = false;
   selectorIndex = constrain(*newPosition, min, arrSize - 1);
@@ -1260,8 +1234,6 @@ void rotarySelector() {
         // beep.NG();
       }
       displayCheckStatus();
-      countNewData = 0;
-      startCountNewData = false;
     } else if (stableWeight != 0.0 && (weight <= stableWeight * 0.9f || weight >= stableWeight * 1.1f)) {
       CHECK_STATUS = 0;
       stableWeight = 0.0;
@@ -1432,6 +1404,7 @@ void rotaryButton() {
     delay(500);
   }
 }
+// END: ENCODER MANAGER //////////////////////////////////////////////////////////////////
 
 void setup() {
   setCpuFrequencyMhz(80);
@@ -1454,7 +1427,7 @@ void setup() {
   doc = getPartList();
   parts = doc["partList"].as<JsonArray>();
 
-  scaleBegin();
+  initScale();
 
   tft.init();
   tft.setRotation(1);
